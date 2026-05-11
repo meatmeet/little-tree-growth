@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import '../models/assessment.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
+import '../utils/constants.dart';
 
 class AssessmentProvider extends ChangeNotifier {
   final ApiService _api = ApiService();
+  final StorageService _storage = StorageService();
 
   List<AssessmentModel> _assessments = [];
   AssessmentModel? _currentAssessment;
@@ -29,8 +32,15 @@ class AssessmentProvider extends ChangeNotifier {
               .toList() ??
           [];
       _assessments = list;
+      _cacheAssessments();
     } catch (e) {
       _error = e.toString();
+      final cached = _storage.getList(AppConstants.assessmentKey);
+      if (cached != null) {
+        _assessments = cached
+            .map((e) => AssessmentModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
     } finally {
       _loading = false;
       notifyListeners();
@@ -79,6 +89,13 @@ class AssessmentProvider extends ChangeNotifier {
   void selectAssessment(AssessmentModel assessment) {
     _currentAssessment = assessment;
     notifyListeners();
+  }
+
+  void _cacheAssessments() {
+    _storage.setList(
+      AppConstants.assessmentKey,
+      _assessments.map((a) => a.toJson()).toList(),
+    );
   }
 
   void clearError() {

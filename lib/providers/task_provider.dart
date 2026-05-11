@@ -26,19 +26,23 @@ class TaskProvider extends ChangeNotifier {
   double get progress =>
       totalCount > 0 ? completedCount / totalCount : 0;
 
-  Future<void> loadTodayTasks() async {
+  Future<void> loadTodayTasks({int? babyId}) async {
     _loading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final res = await _api.get('/tasks/today');
-      final tasks = (res['tasks'] as List<dynamic>?)
+      final params = <String, String>{};
+      if (babyId != null) params['baby_id'] = '$babyId';
+      final res = await _api.get('/tasks/daily', queryParams: params.isNotEmpty ? params : null);
+      final data = res['data'] as Map<String, dynamic>? ?? res;
+      final tasks = (data['tasks'] as List<dynamic>?)
               ?.map((e) => TaskModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [];
       _todayTasks = tasks;
-      _streakDays = res['streak_days'] as int? ?? 0;
+      _streakDays = data['streak_days'] as int? ?? 0;
+      _cacheTodayTasks();
       notifyListeners();
     } catch (e) {
       _error = e.toString();
@@ -61,7 +65,11 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _api.post('/tasks/${task.id}/toggle');
+      if (task.isCompleted) {
+        await _api.put('/tasks/daily/${task.id}/complete');
+      } else {
+        await _api.put('/tasks/daily/${task.id}/skip');
+      }
       _cacheTodayTasks();
       return true;
     } catch (e) {
@@ -81,9 +89,11 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
-  Future<bool> checkin() async {
+  Future<bool> checkin({int? babyId}) async {
     try {
-      await _api.post('/checkin');
+      final body = <String, dynamic>{};
+      if (babyId != null) body['baby_id'] = babyId;
+      await _api.post('/checkin', body: body.isNotEmpty ? body : null);
       _streakDays++;
       notifyListeners();
       return true;

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../providers/baby_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/baby.dart';
 import '../widgets/vip_card.dart';
+import 'login_screen.dart';
+import 'baby_form_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,7 +20,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final babyProvider = context.watch<BabyProvider>();
+    final authProvider = context.watch<AuthProvider>();
     final baby = babyProvider.currentBaby;
+    final user = authProvider.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, size: 22),
-            onPressed: () {},
+            onPressed: () => showSnackBar(context, '设置功能开发中'),
           ),
         ],
       ),
@@ -32,52 +38,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           // User Profile Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.bgCard,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: AppTheme.shadowSm,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryPale,
-                    borderRadius: BorderRadius.circular(14),
+          GestureDetector(
+            onTap: () {
+              if (!authProvider.isLoggedIn) {
+                pushScreen(context, const LoginScreen());
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.bgCard,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: AppTheme.shadowSm,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryPale,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: user != null && user.nickname != null
+                          ? Text(user.nickname![0], style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: AppTheme.primary))
+                          : const Icon(Icons.person, color: AppTheme.primary, size: 28),
+                    ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.person, color: AppTheme.primary, size: 28),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '点击登录',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.nickname ?? (user != null ? user.phone : '点击登录'),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textPrimary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        '登录后可同步全部数据',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.textSecondary,
+                        const SizedBox(height: 2),
+                        Text(
+                          user != null ? '已登录' : '登录后可同步全部数据',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(Icons.chevron_right, color: AppTheme.textTertiary),
-              ],
+                  if (!authProvider.isLoggedIn)
+                    const Icon(Icons.chevron_right, color: AppTheme.textTertiary),
+                ],
+              ),
             ),
           ),
 
@@ -85,8 +101,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // VIP Card
           VipCard(
-            isVip: false,
-            onActivate: () {},
+            isVip: authProvider.isVip,
+            expireAt: user?.vipExpireAt,
+            onActivate: () => showSnackBar(context, '会员功能开发中'),
           ),
 
           const SizedBox(height: 20),
@@ -104,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               GestureDetector(
-                onTap: () => _showAddBabyDialog(context),
+                onTap: () => pushScreen(context, const BabyFormScreen()),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 6),
@@ -154,10 +171,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 10),
 
-          _settingItem(Icons.notifications_outlined, '消息通知', () {}),
-          _settingItem(Icons.cloud_sync_outlined, '数据同步', () {}),
-          _settingItem(Icons.shield_outlined, '隐私设置', () {}),
-          _settingItem(Icons.info_outline, '关于我们', () {}),
+          _settingItem(Icons.notifications_outlined, '消息通知', () => showSnackBar(context, '开发中')),
+          _settingItem(Icons.cloud_sync_outlined, '数据同步', () => showSnackBar(context, '开发中')),
+          _settingItem(Icons.shield_outlined, '隐私设置', () => showSnackBar(context, '开发中')),
+          _settingItem(Icons.info_outline, '关于我们', () => showSnackBar(context, '小树成长 v1.0.0')),
 
           const SizedBox(height: 32),
 
@@ -257,7 +274,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             IconButton(
               icon: const Icon(Icons.edit_outlined,
                   size: 18, color: AppTheme.textTertiary),
-              onPressed: () {},
+              onPressed: () => pushScreen(context, BabyFormScreen(baby: baby)),
             ),
           ],
         ),
@@ -327,7 +344,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showAddBabyDialog(BuildContext context) {
-    // TODO: Implement add baby dialog
-  }
 }

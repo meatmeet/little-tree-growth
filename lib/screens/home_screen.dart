@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../providers/baby_provider.dart';
 import '../providers/task_provider.dart';
+import '../providers/growth_provider.dart';
 import '../widgets/task_card.dart';
 import '../widgets/streak_card.dart';
 import '../widgets/measure_card.dart';
+import 'growth_record_form_screen.dart';
+import 'milestone_form_screen.dart';
+import 'assessment_screen.dart';
+import 'growth_screen.dart';
+import 'task_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().loadTodayTasks();
+      final baby = context.read<BabyProvider>().currentBaby;
+      if (baby != null) {
+        context.read<GrowthProvider>().loadRecords(baby.id);
+      }
     });
   }
 
@@ -27,7 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final babyProvider = context.watch<BabyProvider>();
     final taskProvider = context.watch<TaskProvider>();
+    final growthProvider = context.watch<GrowthProvider>();
     final baby = babyProvider.currentBaby;
+    final latest = growthProvider.latestRecord;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined, size: 22),
-            onPressed: () {},
+            onPressed: () => showSnackBar(context, '通知功能开发中'),
           ),
         ],
       ),
@@ -98,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TaskCard(
                     task: task,
                     onToggle: () => taskProvider.toggleTask(task),
+                    onTap: () => pushScreen(context, TaskDetailScreen(task: task)),
                   ),
                 ),
               ),
@@ -117,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => pushScreen(context, const GrowthScreen()),
                   child: const Text('查看全部',
                       style: TextStyle(fontSize: 13)),
                 ),
@@ -129,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: MeasureCard(
                     label: '身高',
-                    value: '--',
+                    value: latest?.heightCm?.toStringAsFixed(1) ?? '--',
                     unit: 'cm',
                     icon: Icons.straighten,
                     color: AppTheme.primary,
@@ -139,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: MeasureCard(
                     label: '体重',
-                    value: '--',
+                    value: latest?.weightKg?.toStringAsFixed(1) ?? '--',
                     unit: 'kg',
                     icon: Icons.monitor_weight,
                     color: AppTheme.warm,
@@ -149,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: MeasureCard(
                     label: '头围',
-                    value: '--',
+                    value: latest?.headCircCm?.toStringAsFixed(1) ?? '--',
                     unit: 'cm',
                     icon: Icons.circle_outlined,
                     color: AppTheme.info,
@@ -163,11 +177,17 @@ class _HomeScreenState extends State<HomeScreen> {
             // Quick Actions
             Row(
               children: [
-                _actionButton('记录成长', Icons.edit_note, AppTheme.primary),
+                _actionButton('记录成长', Icons.edit_note, AppTheme.primary, () {
+                  pushScreen(context, const GrowthRecordFormScreen());
+                }),
                 const SizedBox(width: 12),
-                _actionButton('开始评测', Icons.assessment, AppTheme.warm),
+                _actionButton('开始评测', Icons.assessment, AppTheme.warm, () {
+                  pushScreen(context, const AssessmentScreen());
+                }),
                 const SizedBox(width: 12),
-                _actionButton('里程碑', Icons.emoji_events_outlined, AppTheme.info),
+                _actionButton('里程碑', Icons.emoji_events_outlined, AppTheme.info, () {
+                  pushScreen(context, const MilestoneFormScreen());
+                }),
               ],
             ),
 
@@ -178,10 +198,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _actionButton(String label, IconData icon, Color color) {
+  Widget _actionButton(String label, IconData icon, Color color, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
-        onTap: () {},
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -51,38 +52,62 @@ class ApiService {
 
   Future<Map<String, dynamic>> get(String path,
       {Map<String, String>? queryParams}) async {
-    final uri = Uri.parse('$baseUrl$path')
-        .replace(queryParameters: queryParams);
-    final response = await http
-        .get(uri, headers: _headers)
-        .timeout(const Duration(seconds: 15));
-    return _handleResponse(response);
+    return _safeRequest(() async {
+      final uri = Uri.parse('$baseUrl$path')
+          .replace(queryParameters: queryParams);
+      final response = await http
+          .get(uri, headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    });
   }
 
   Future<Map<String, dynamic>> post(String path,
       {Map<String, dynamic>? body}) async {
-    final uri = Uri.parse('$baseUrl$path');
-    final response = await http
-        .post(uri, headers: _headers, body: body != null ? jsonEncode(body) : null)
-        .timeout(const Duration(seconds: 15));
-    return _handleResponse(response);
+    return _safeRequest(() async {
+      final uri = Uri.parse('$baseUrl$path');
+      final response = await http
+          .post(uri, headers: _headers, body: body != null ? jsonEncode(body) : null)
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    });
   }
 
   Future<Map<String, dynamic>> put(String path,
       {Map<String, dynamic>? body}) async {
-    final uri = Uri.parse('$baseUrl$path');
-    final response = await http
-        .put(uri, headers: _headers, body: body != null ? jsonEncode(body) : null)
-        .timeout(const Duration(seconds: 15));
-    return _handleResponse(response);
+    return _safeRequest(() async {
+      final uri = Uri.parse('$baseUrl$path');
+      final response = await http
+          .put(uri, headers: _headers, body: body != null ? jsonEncode(body) : null)
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    });
   }
 
   Future<Map<String, dynamic>> delete(String path) async {
-    final uri = Uri.parse('$baseUrl$path');
-    final response = await http
-        .delete(uri, headers: _headers)
-        .timeout(const Duration(seconds: 15));
-    return _handleResponse(response);
+    return _safeRequest(() async {
+      final uri = Uri.parse('$baseUrl$path');
+      final response = await http
+          .delete(uri, headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    });
+  }
+
+  /// Catches network/timeout errors and throws ApiException with friendly message.
+  Future<Map<String, dynamic>> _safeRequest(
+      Future<Map<String, dynamic>> Function() request) async {
+    try {
+      return await request();
+    } on SocketException {
+      throw ApiException(0, '网络连接失败，请检查网络设置');
+    } on HttpException {
+      throw ApiException(0, '服务器连接异常');
+    } on TimeoutException {
+      throw ApiException(0, '请求超时，请稍后重试');
+    } on FormatException {
+      throw ApiException(0, '数据格式异常');
+    }
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {

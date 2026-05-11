@@ -17,6 +17,16 @@ class GrowthRecord {
     this.notes,
   });
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'baby_id': babyId,
+    'record_date': recordDate.toIso8601String().substring(0, 10),
+    'height_cm': heightCm,
+    'weight_kg': weightKg,
+    'head_circ_cm': headCircCm,
+    'notes': notes,
+  };
+
   factory GrowthRecord.fromJson(Map<String, dynamic> json) {
     return GrowthRecord(
       id: json['id'],
@@ -72,6 +82,15 @@ class Milestone {
       default: return '🏅';
     }
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'baby_id': babyId,
+    'milestone_type': milestoneType,
+    'occurred_at': occurredAt?.toIso8601String(),
+    'notes': notes,
+    'photo_url': photoUrl,
+  };
 
   factory Milestone.fromJson(Map<String, dynamic> json) {
     return Milestone(

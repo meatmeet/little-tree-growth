@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'utils/theme.dart';
+import 'providers/auth_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/assessment_screen.dart';
 import 'screens/growth_screen.dart';
 import 'screens/courses_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/login_screen.dart';
 
 class LittleTreeApp extends StatelessWidget {
   const LittleTreeApp({super.key});
@@ -15,8 +18,39 @@ class LittleTreeApp extends StatelessWidget {
       title: '小树成长',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home: const MainShell(),
+      home: const _AppGate(),
     );
+  }
+}
+
+/// Auth gate: shows login or main shell based on auth state.
+class _AppGate extends StatefulWidget {
+  const _AppGate();
+
+  @override
+  State<_AppGate> createState() => _AppGateState();
+}
+
+class _AppGateState extends State<_AppGate> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthProvider>().checkAuth();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
+    if (!auth.initialized) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return auth.isLoggedIn ? const MainShell() : const LoginScreen();
   }
 }
 
@@ -24,11 +58,18 @@ class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  MainShellState createState() => MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+
+  /// Called by child screens to switch tabs programmatically.
+  void switchToTab(int index) {
+    if (index >= 0 && index < 5) {
+      setState(() => _currentIndex = index);
+    }
+  }
 
   final List<Widget> _screens = const [
     HomeScreen(),

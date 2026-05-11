@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
+import '../models/growth_record.dart';
 import '../providers/baby_provider.dart';
+import '../providers/growth_provider.dart';
 import '../widgets/measure_card.dart';
+import 'growth_record_form_screen.dart';
+import 'milestone_form_screen.dart';
 
 class GrowthScreen extends StatefulWidget {
   const GrowthScreen({super.key});
@@ -19,6 +24,13 @@ class _GrowthScreenState extends State<GrowthScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final baby = context.read<BabyProvider>().currentBaby;
+      if (baby != null) {
+        context.read<GrowthProvider>().loadRecords(baby.id);
+        context.read<GrowthProvider>().loadMilestones(baby.id);
+      }
+    });
   }
 
   @override
@@ -30,6 +42,8 @@ class _GrowthScreenState extends State<GrowthScreen>
   @override
   Widget build(BuildContext context) {
     final baby = context.watch<BabyProvider>().currentBaby;
+    final growth = context.watch<GrowthProvider>();
+    final latest = growth.latestRecord;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,12 +79,15 @@ class _RecordsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final growth = context.watch<GrowthProvider>();
+    final latest = growth.latestRecord;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         // Quick Add
         GestureDetector(
-          onTap: () {},
+          onTap: () => pushScreen(context, const GrowthRecordFormScreen()),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -117,7 +134,7 @@ class _RecordsTab extends StatelessWidget {
             Expanded(
               child: MeasureCard(
                 label: '身高',
-                value: baby != null ? '--' : '--',
+                value: latest?.heightCm?.toStringAsFixed(1) ?? '--',
                 unit: 'cm',
                 icon: Icons.straighten,
                 color: AppTheme.primary,
@@ -127,7 +144,7 @@ class _RecordsTab extends StatelessWidget {
             Expanded(
               child: MeasureCard(
                 label: '体重',
-                value: '--',
+                value: latest?.weightKg?.toStringAsFixed(1) ?? '--',
                 unit: 'kg',
                 icon: Icons.monitor_weight,
                 color: AppTheme.warm,
@@ -137,7 +154,7 @@ class _RecordsTab extends StatelessWidget {
             Expanded(
               child: MeasureCard(
                 label: '头围',
-                value: '--',
+                value: latest?.headCircCm?.toStringAsFixed(1) ?? '--',
                 unit: 'cm',
                 icon: Icons.circle_outlined,
                 color: AppTheme.info,
@@ -159,8 +176,50 @@ class _RecordsTab extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        _emptyRecords(),
+        // History List
+        if (growth.records.isNotEmpty)
+          ...growth.records.map((r) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _recordRow(r),
+          ))
+        else
+          _emptyRecords(),
       ],
+    );
+  }
+
+  Widget _recordRow(GrowthRecord r) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.bgCard,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: AppTheme.shadowSm,
+      ),
+      child: Row(
+        children: [
+          Text('${r.recordDate.month}/${r.recordDate.day}',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const SizedBox(width: 16),
+          if (r.heightCm != null) ...[
+            const Icon(Icons.straighten, size: 14, color: AppTheme.primary),
+            const SizedBox(width: 2),
+            Text('${r.heightCm!.toStringAsFixed(1)}cm', style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+            const SizedBox(width: 10),
+          ],
+          if (r.weightKg != null) ...[
+            const Icon(Icons.monitor_weight, size: 14, color: AppTheme.warm),
+            const SizedBox(width: 2),
+            Text('${r.weightKg!.toStringAsFixed(1)}kg', style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+            const SizedBox(width: 10),
+          ],
+          if (r.headCircCm != null) ...[
+            const Icon(Icons.circle_outlined, size: 14, color: AppTheme.info),
+            const SizedBox(width: 2),
+            Text('${r.headCircCm!.toStringAsFixed(1)}cm', style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+          ],
+        ],
+      ),
     );
   }
 
@@ -208,7 +267,7 @@ class _MilestonesTab extends StatelessWidget {
       children: [
         // Add milestone button
         GestureDetector(
-          onTap: () {},
+          onTap: () => pushScreen(context, const MilestoneFormScreen()),
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(

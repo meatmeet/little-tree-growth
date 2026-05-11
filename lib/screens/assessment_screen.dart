@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../models/assessment.dart';
 import '../providers/baby_provider.dart';
 import '../providers/assessment_provider.dart';
+import 'assessment_detail_screen.dart';
 
 class AssessmentScreen extends StatefulWidget {
   const AssessmentScreen({super.key});
@@ -164,7 +166,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
 
   Widget _assessmentCard(AssessmentModel assessment) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () => pushScreen(context, AssessmentDetailScreen(assessment: assessment)),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -294,7 +296,12 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
 
   void _startAssessment(BuildContext context, dynamic baby) {
     if (baby == null) return;
-    // TODO: Navigate to assessment flow
+    final provider = context.read<AssessmentProvider>();
+    provider.createAssessment(baby.id, baby.ageInMonths.toDouble()).then((a) {
+      if (a != null && context.mounted) {
+        pushScreen(context, AssessmentDetailScreen(assessment: a));
+      }
+    });
   }
 
   Color _getStatusColor(String status) {

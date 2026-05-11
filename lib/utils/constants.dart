@@ -16,6 +16,7 @@ class AppConstants {
   static const String userKey = 'user_data';
   static const String babyKey = 'baby_data';
   static const String taskKey = 'task_cache';
+  static const String assessmentKey = 'assessment_cache';
   static const String settingsKey = 'app_settings';
 
   // Assessment

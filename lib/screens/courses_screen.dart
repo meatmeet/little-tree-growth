@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../providers/baby_provider.dart';
 import '../widgets/course_item.dart';
+import 'course_detail_screen.dart';
 
-class CoursesScreen extends StatelessWidget {
+class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
+
+  @override
+  State<CoursesScreen> createState() => _CoursesScreenState();
+}
+
+class _CoursesScreenState extends State<CoursesScreen> {
+  int _selectedFilter = 0;
+  final _ageFilters = ['0-6个月', '6-12个月', '1-2岁', '2-3岁', '3-6岁'];
 
   @override
   Widget build(BuildContext context) {
     final baby = context.watch<BabyProvider>().currentBaby;
+    final filterLabel = _ageFilters[_selectedFilter];
 
     return Scaffold(
       appBar: AppBar(
@@ -74,34 +85,35 @@ class CoursesScreen extends StatelessWidget {
             height: 36,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: ['0-6个月', '6-12个月', '1-2岁', '2-3岁', '3-6岁']
-                  .map((label) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: label == '1-2岁'
-                                  ? AppTheme.primary
-                                  : AppTheme.bgMuted,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Text(
-                              label,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: label == '1-2岁'
-                                    ? Colors.white
-                                    : AppTheme.textSecondary,
-                              ),
-                            ),
-                          ),
+              children: List.generate(_ageFilters.length, (i) {
+                final selected = i == _selectedFilter;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedFilter = i),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppTheme.primary
+                            : AppTheme.bgMuted,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Text(
+                        _ageFilters[i],
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: selected
+                              ? Colors.white
+                              : AppTheme.textSecondary,
                         ),
-                      ))
-                  .toList(),
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
 
@@ -123,6 +135,12 @@ class CoursesScreen extends StatelessWidget {
             title: '认知启蒙',
             subtitle: '通过游戏激发宝宝的好奇心与探索欲',
             color: AppTheme.areaAdaptation,
+            onTap: () => pushScreen(context, CourseDetailScreen(
+              title: '认知启蒙',
+              subtitle: '通过游戏激发宝宝的好奇心与探索欲',
+              ageRange: '0-3岁',
+              color: AppTheme.areaAdaptation,
+            )),
           ),
           const SizedBox(height: 8),
           _featuredCourse(
@@ -130,6 +148,12 @@ class CoursesScreen extends StatelessWidget {
             title: '大运动发展',
             subtitle: '从翻身到走路，逐步提升运动能力',
             color: AppTheme.areaGrossMotor,
+            onTap: () => pushScreen(context, CourseDetailScreen(
+              title: '大运动发展',
+              subtitle: '从翻身到走路，逐步提升运动能力',
+              ageRange: '0-6岁',
+              color: AppTheme.areaGrossMotor,
+            )),
           ),
           const SizedBox(height: 8),
           _featuredCourse(
@@ -137,6 +161,12 @@ class CoursesScreen extends StatelessWidget {
             title: '语言启蒙',
             subtitle: '听说读写全方位语言能力培养',
             color: AppTheme.areaLanguage,
+            onTap: () => pushScreen(context, CourseDetailScreen(
+              title: '语言启蒙',
+              subtitle: '听说读写全方位语言能力培养',
+              ageRange: '0-6岁',
+              color: AppTheme.areaLanguage,
+            )),
           ),
 
           const SizedBox(height: 20),
@@ -155,11 +185,15 @@ class CoursesScreen extends StatelessWidget {
           ...List.generate(4, (i) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: CourseItem(
-              title: _demoCourses[i]['title'],
-              subtitle: _demoCourses[i]['subtitle'],
+              title: _demoCourses[i]['title'] as String,
+              subtitle: _demoCourses[i]['subtitle'] as String,
               progressText: '${(_demoCourses[i]['progress'] as num).toInt()}%',
               progress: (_demoCourses[i]['progress'] as num) / 100,
-              onTap: () {},
+              onTap: () => pushScreen(context, CourseDetailScreen(
+                title: _demoCourses[i]['title'] as String,
+                subtitle: _demoCourses[i]['subtitle'] as String,
+                ageRange: filterLabel,
+              )),
             ),
           )),
 
@@ -174,9 +208,10 @@ class CoursesScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required Color color,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(

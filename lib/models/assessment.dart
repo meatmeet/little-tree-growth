@@ -28,6 +28,17 @@ class AssessmentModel {
     return '需就医';
   }
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'baby_id': babyId,
+    'assessment_date': assessmentDate.toIso8601String(),
+    'actual_age_months': actualAgeMonths,
+    'overall_dq': overallDq,
+    'overall_mental_age': overallMentalAge,
+    'status': status,
+    'areas': areas?.map((a) => a.toJson()).toList(),
+  };
+
   factory AssessmentModel.fromJson(Map<String, dynamic> json) {
     return AssessmentModel(
       id: json['id'],
@@ -61,6 +72,14 @@ class AreaResult {
 
   double get percentage =>
       itemsTotal > 0 ? (itemsPassed / itemsTotal * 100) : 0;
+
+  Map<String, dynamic> toJson() => {
+    'area': area,
+    'mental_age': mentalAge,
+    'dq_score': dqScore,
+    'items_passed': itemsPassed,
+    'items_total': itemsTotal,
+  };
 
   factory AreaResult.fromJson(Map<String, dynamic> json) {
     return AreaResult(

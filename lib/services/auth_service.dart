@@ -1,6 +1,7 @@
 import 'api_service.dart';
 import 'storage_service.dart';
 import '../models/user.dart';
+import '../utils/constants.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -28,10 +29,11 @@ class AuthService {
   Future<UserModel> login(String phone, String code) async {
     final res = await _api.post('/auth/login', body: {
       'phone': phone,
-      'code': code,
+      'password': code,
     });
-    await _api.setToken(res['token'] as String?);
-    _currentUser = UserModel.fromJson(res['user'] as Map<String, dynamic>);
+    final data = res['data'] as Map<String, dynamic>;
+    await _api.setToken(data['token'] as String?);
+    _currentUser = UserModel.fromJson(data['user'] as Map<String, dynamic>);
     await _storage.setJson(AppConstants.userKey,
         (_currentUser!.toJson()));
     return _currentUser!;
@@ -50,9 +52,10 @@ class AuthService {
     await _storage.remove(AppConstants.userKey);
   }
 
-  Future<UserModel> updateProfile(Map<String, dynamic> data) async {
-    final res = await _api.put('/user/profile', body: data);
-    _currentUser = UserModel.fromJson(res['user'] as Map<String, dynamic>);
+  Future<UserModel> updateProfile(Map<String, dynamic> profileData) async {
+    final res = await _api.put('/user/profile', body: profileData);
+    final data = res['data'] as Map<String, dynamic>;
+    _currentUser = UserModel.fromJson(data['user'] as Map<String, dynamic>);
     await _storage.setJson(AppConstants.userKey,
         (_currentUser!.toJson()));
     return _currentUser!;
