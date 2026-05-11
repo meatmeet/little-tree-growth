@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小树成长 · 设计原型 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN SYSTEM — 小树成长 · 有机自然风
+   ================================================================ */
+:root {
+  --green-900: #1B4332;
+  --green-800: #2D6A4F;
+  --green-700: #3D8B61;
+  --green-600: #52B788;
+  --green-500: #74C69D;
+  --green-200: #B7E4C7;
+  --green-100: #D8F3DC;
+  --green-50:  #F0FDF4;
+
+  --warm-500: #F4A261;
+  --warm-400: #F6B97A;
+  --warm-300: #F9CF9E;
+  --warm-200: #FCE4C1;
+  --warm-100: #FEF0D6;
+  --warm-50:  #FFF8EE;
+
+  --coral-500: #E76F51;
+  --coral-100: #FDE8E3;
+
+  --berry-500: #C77DFF;
+  --berry-100: #F3E8FF;
+
+  --sky-500: #48CAE4;
+  --sky-100: #E0F7FA;
+
+  --text-primary: #1A1A2E;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-on-dark: #FFFFFF;
+
+  --bg-warm: #FFFAF5;
+  --bg-white: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-muted: #F8F9FA;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --font-display: 'ZCOOL QingKe HuangYou', 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-warm);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page header */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--green-800);
+  letter-spacing: 2px;
+}
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* Phone showcase */
+.phone-container {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.phone {
+  width: 375px;
+  min-height: 780px;
+  background: var(--bg-warm);
+  border-radius: 44px;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: transform var(--transition);
+}
+.phone:hover {
+  transform: translateY(-4px);
+}
+
+/* Status bar */
+.status-bar {
+  height: 48px;
+  background: var(--bg-warm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+/* Screen content */
+.screen-content {
+  padding: 0 20px 80px;
+  position: relative;
+}
+
+/* ================================================================
+   TAB BAR
+   ================================================================ */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  padding: 6px 0 10px;
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  transition: color var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.tab-item.active {
+  color: var(--green-800);
+}
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: var(--green-800);
+  border-radius: 2px;
+}
+.tab-icon { font-size: 22px; display: block; margin-bottom: 1px; }
+
+/* ================================================================
+   COMPONENTS
+   ================================================================ */
+
+/* Section header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+.section-link {
+  font-size: 13px;
+  color: var(--green-700);
+  font-weight: 500;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Card base */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Green blob decoration */
+.blob-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 260px;
+  background: linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 50%, var(--warm-50) 100%);
+  border-radius: 0 0 60% 40% / 0 0 30% 20%;
+  z-index: 0;
+}
+
+/* ================================================================
+   SCREEN 1: HOME / DAILY TASKS
+   ================================================================ */
+.s1 {
+  background: var(--bg-warm);
+}
+.s1 .status-bar { background: transparent; }
+
+/* Header profile area */
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0 14px;
+  position: relative;
+  z-index: 1;
+}
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: white;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.6);
+  box-shadow: var(--shadow-sm);
+}
+.profile-info { flex: 1; }
+.profile-greeting {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.profile-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  margin-top: -2px;
+}
+.profile-badge {
+  font-size: 11px;
+  color: var(--green-700);
+  background: var(--green-50);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  margin-left: auto;
+  white-space: nowrap;
+  border: 1px solid rgba(45, 106, 79, 0.1);
+}
+
+/* Streak card */
+.streak-card {
+  background: linear-gradient(135deg, #FEF9E7, #FDEBD0);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(244, 162, 97, 0.15);
+  position: relative;
+  z-index: 1;
+}
+.streak-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #F4A261, #E76F51);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.streak-info { flex: 1; }
+.streak-number {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.streak-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.streak-rank {
+  font-size: 12px;
+  color: #92400E;
+  background: rgba(255,255,255,0.7);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+/* Theme tag */
+.theme-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 12px;
+}
+.theme-gross { background: #DCFCE7; color: #15803D; }
+.theme-fine  { background: #DBEAFE; color: #1D4ED8; }
+.theme-lang  { background: #FEF3C7; color: #B45309; }
+.theme-cog   { background: #F3E8FF; color: #7C3AED; }
+.theme-soc   { background: #FCE7F3; color: #BE185D; }
+
+/* Task card */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: all var(--transition);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.task-item:hover {
+  box-shadow: var(--shadow-md);
+  border-color: rgba(45, 106, 79, 0.1);
+}
+.task-check {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #D1D5DB;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: transparent;
+  transition: all var(--transition);
+}
+.task-check.done {
+  background: var(--green-800);
+  border-color: var(--green-800);
+  color: white;
+  box-shadow: 0 2px 8px rgba(45, 106, 79, 0.3);
+}
+.task-info { flex: 1; }
+.task-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.task-meta {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 3px;
+  display: flex;
+  gap: 12px;
+}
+.task-meta span { display: flex; align-items: center; gap: 3px; }
+.task-time {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Start button */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px 0;
+  background: linear-gradient(135deg, var(--green-800), var(--green-600));
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.3);
+  transition: all var(--transition);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(45, 106, 79, 0.4);
+}
+
+/* Recommended horizontal scroll */
+.rec-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 1;
+}
+.rec-scroll::-webkit-scrollbar { display: none; }
+.rec-card {
+  min-width: 150px;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.rec-card:hover { transform: translateY(-2px); }
+.rec-card-tag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+.rec-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 6px;
+  line-height: 1.3;
+}
+.rec-card-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ================================================================
+   SCREEN 2: ASSESSMENT REPORT
+   ================================================================ */
+.s2 {
+  background: var(--bg-white);
+}
+.s2 .status-bar { background: var(--bg-white); }
+
+.report-header {
+  text-align: center;
+  padding: 8px 0 4px;
+  position: relative;
+}
+.report-header::after {
+  content: '🌱';
+  position: absolute;
+  right: 0;
+  top: 8px;
+  font-size: 28px;
+  opacity: 0.6;
+}
+.report-baby {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.report-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0;
+  letter-spacing: -0.5px;
+}
+.report-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* DQ circle */
+.dq-ring {
+  width: 120px;
+  height: 120px;
+  margin: 18px auto 0;
+  position: relative;
+}
+.dq-ring svg { transform: rotate(-90deg); }
+.dq-ring-bg {
+  fill: none;
+  stroke: #F3F4F6;
+  stroke-width: 8;
+}
+.dq-ring-fg {
+  fill: none;
+  stroke: url(#dqGrad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 47;
+  transition: stroke-dashoffset 1.5s ease;
+}
+.dq-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.dq-number {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--green-800);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.dq-unit {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: -2px;
+}
+.dq-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-800);
+  background: var(--green-50);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  margin-top: 6px;
+}
+
+/* Area grid - 2x3 */
+.area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 18px 0;
+}
+.area-card {
+  background: #F9FAFB;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.area-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.area-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.area-score {
+  font-size: 15px;
+  font-weight: 700;
+}
+.area-bar {
+  width: 100%;
+  height: 5px;
+  background: #E5E7EB;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.area-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+.area-status {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.advice-card {
+  background: linear-gradient(135deg, var(--green-50), var(--bg-warm));
+  border: 1px solid rgba(45, 106, 79, 0.1);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.advice-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.advice-card-header span:first-child {
+  font-size: 16px;
+}
+.advice-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-800);
+}
+.advice-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.advice-body strong { color: var(--text-primary); }
+
+.action-row {
+  display: flex;
+  gap: 10px;
+}
+.action-btn {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.action-btn.primary {
+  background: var(--green-800);
+  color: white;
+}
+.action-btn.primary:hover {
+  background: var(--green-900);
+}
+.action-btn.secondary {
+  background: #F3F4F6;
+  color: var(--text-primary);
+}
+.action-btn.secondary:hover {
+  background: #E5E7EB;
+}
+
+/* ================================================================
+   SCREEN 3: GROWTH DATA
+   ================================================================ */
+.s3 {
+  background: var(--bg-warm);
+}
+.s3 .status-bar { background: var(--bg-warm); }
+
+/* Measurement cards */
+.measure-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.measure-card {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.measure-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.measure-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.measure-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2px 0;
+  letter-spacing: -0.5px;
+}
+.measure-unit {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.measure-percentile {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green-700);
+  background: var(--green-50);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-top: 4px;
+}
+
+/* Chart area */
+.chart-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.chart-tabs {
+  display: flex;
+  background: #F3F4F6;
+  border-radius: 8px;
+  padding: 2px;
+}
+.chart-tab {
+  padding: 4px 12px;
+  font-size: 11px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.chart-tab.active {
+  background: white;
+  color: var(--green-800);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+.chart-svg-wrap {
+  width: 100%;
+  height: 170px;
+  position: relative;
+}
+
+/* Milestones */
+.milestone-section {
+  margin-top: 20px;
+}
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.milestone-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 20px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--green-200), var(--green-500));
+  border-radius: 1px;
+}
+.tl-item {
+  position: relative;
+  padding: 0 0 16px 18px;
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot {
+  position: absolute;
+  left: -18px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--green-800);
+  border: 3px solid var(--green-100);
+}
+.tl-date {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.tl-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.tl-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-top: 4px;
+}
+
+/* Mini calendar */
+.mini-cal {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.cal-cell {
+  flex: 1;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+}
+.cal-cell.done {
+  background: var(--green-800);
+  color: white;
+}
+.cal-cell.miss {
+  background: #F3F4F6;
+  color: #D1D5DB;
+}
+.cal-cell.today {
+  background: var(--warm-500);
+  color: white;
+  box-shadow: 0 2px 8px rgba(244,162,97,0.4);
+}
+
+/* ================================================================
+   SCREEN 4: COURSES
+   ================================================================ */
+.s4 {
+  background: var(--bg-white);
+}
+.s4 .status-bar { background: var(--bg-white); }
+
+.course-hero {
+  background: linear-gradient(135deg, var(--green-800), #1B6B4A, var(--green-700));
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.course-hero::before {
+  content: '🌿';
+  position: absolute;
+  right: -5px;
+  bottom: -10px;
+  font-size: 80px;
+  opacity: 0.12;
+}
+.course-hero-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.15);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.5px;
+}
+.course-hero-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 8px 0 4px;
+  letter-spacing: -0.3px;
+}
+.course-hero-sub {
+  font-size: 13px;
+  opacity: 0.85;
+  font-weight: 400;
+}
+.course-hero-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.course-hero-meta span {
+  background: rgba(255,255,255,0.12);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.course-list-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.course-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: #FAFAFA;
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  transition: all var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.course-item:hover {
+  background: white;
+  border-color: rgba(45, 106, 79, 0.08);
+  box-shadow: var(--shadow-sm);
+}
+.course-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.course-info { flex: 1; }
+.course-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.course-desc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+.course-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 5px;
+}
+.course-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.badge-free { background: #FEF3C7; color: #92400E; }
+.badge-vip { background: var(--green-800); color: white; }
+
+.progress-summary {
+  background: linear-gradient(135deg, var(--green-50), var(--warm-50));
+  border: 1px solid rgba(45, 106, 79, 0.08);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.progress-icon {
+  font-size: 28px;
+}
+.progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-800);
+}
+.progress-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ================================================================
+   SCREEN 5: PROFILE
+   ================================================================ */
+.s5 {
+  background: var(--bg-warm);
+}
+.s5 .status-bar { background: var(--bg-warm); }
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 20px;
+}
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  flex-shrink: 0;
+  border: 3px solid var(--green-200);
+}
+.profile-name-big {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.profile-days {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.profile-edit {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--green-700);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.vip-card {
+  background: linear-gradient(135deg, #1B4332, #2D6A4F, #3D8B61);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.vip-card::after {
+  content: '🌱';
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font-size: 48px;
+  opacity: 0.1;
+}
+.vip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.vip-label {
+  font-size: 11px;
+  opacity: 0.7;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.vip-plan {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 4px 0 2px;
+}
+.vip-expire {
+  font-size: 12px;
+  opacity: 0.65;
+}
+.vip-tag {
+  text-align: right;
+}
+.vip-tag-main {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.vip-tag-sub {
+  font-size: 10px;
+  opacity: 0.7;
+  background: rgba(255,255,255,0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-top: 4px;
+}
+.vip-features {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.vip-feature {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.menu-item {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.menu-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.menu-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.menu-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.list-group { border-top: 1px solid #F0F0F0; }
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #F5F5F5;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.list-item:hover { opacity: 0.7; }
+.list-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.list-arrow {
+  color: var(--text-tertiary);
+  font-size: 16px;
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.a-1 { animation: fadeInUp 0.5s ease both; }
+.a-2 { animation: fadeInUp 0.5s ease 0.08s both; }
+.a-3 { animation: fadeInUp 0.5s ease 0.16s both; }
+.a-4 { animation: fadeInUp 0.5s ease 0.24s both; }
+.a-5 { animation: fadeInUp 0.5s ease 0.32s both; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 16px rgba(45, 106, 79, 0.3); }
+  50%      { box-shadow: 0 4px 24px rgba(45, 106, 79, 0.5); }
+}
+.btn-pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 860px) {
+  body { padding: 24px 12px; }
+  .phone { width: 100%; max-width: 375px; margin-bottom: 8px; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>🌱 小树成长 · 设计原型 v2</h1>
+  <p>有机自然风 · 五屏交互演示 · 双击手机可全屏查看</p>
+</header>
+
+<div class="phone-container">
+
+  <!-- ===================================================================
+       SCREEN 1: 首页 · 每日任务
+       =================================================================== -->
+  <div class="phone s1">
+    <div class="blob-bg"></div>
+    <div class="status-bar"><span>9:41</span><span style="opacity:0.6">📶 📶 91%</span></div>
+    <div class="screen-content">
+
+      <div class="profile-row a-1">
+        <div class="avatar">👩</div>
+        <div class="profile-info">
+          <div class="profile-greeting">早上好 ☀️</div>
+          <div class="profile-name">小树妈妈</div>
+        </div>
+        <div class="profile-badge">小宝 · 1岁0个月</div>
+      </div>
+
+      <div class="streak-card a-2">
+        <div class="streak-icon">🔥</div>
+        <div class="streak-info">
+          <div class="streak-number">12 天</div>
+          <div class="streak-label">连续打卡，超越 85% 的家长</div>
+        </div>
+        <div class="streak-rank">🏆 优秀</div>
+      </div>
+
+      <div class="section-header a-3">
+        <span class="section-title">今日任务</span>
+        <span class="section-link">查看全部 →</span>
+      </div>
+
+      <div class="theme-tag theme-gross a-3">🏃 运动日</div>
+
+      <div class="task-item a-3">
+        <div class="task-check done">✓</div>
+        <div class="task-info">
+          <div class="task-title">小树站桩</div>
+          <div class="task-meta">
+            <span>🏃 大运动</span>
+            <span>⏱ 10分钟</span>
+          </div>
+        </div>
+        <div class="task-time">已完成</div>
+      </div>
+
+      <div class="task-item a-4">
+        <div class="task-check" style="border-color:#52B788;"></div>
+        <div class="task-info">
+          <div class="task-title">捏豆入瓶</div>
+          <div class="task-meta">
+            <span>✋ 精细动作</span>
+            <span>⏱ 10分钟</span>
+            <span>🎯 本周重点</span>
+          </div>
+        </div>
+        <div class="task-time">建议 10:00</div>
+      </div>
+
+      <div class="task-item a-4">
+        <div class="task-check"></div>
+        <div class="task-info">
+          <div class="task-title">这是什么？</div>
+          <div class="task-meta">
+            <span>🗣 语言</span>
+            <span>⏱ 8分钟</span>
+          </div>
+        </div>
+        <div class="task-time">建议 15:00</div>
+      </div>
+
+      <button class="btn-primary a-4 btn-pulse">▶ 开始今天训练</button>
+
+      <div style="height:20px;"></div>
+
+      <div class="section-header a-5">
+        <span class="section-title">为你推荐</span>
+        <span class="section-link">更多 →</span>
+      </div>
+
+      <div class="rec-scroll a-5">
+        <div class="rec-card" style="background:#D8F3DC;">
+          <div class="rec-card-tag" style="color:#2D6A4F;">📖 家长课堂</div>
+          <div class="rec-card-title">1岁语言爆发期<br>科学引导方法</div>
+          <div class="rec-card-meta">3分钟 · 免费</div>
+        </div>
+        <div class="rec-card" style="background:#FEF0D6;">
+          <div class="rec-card-tag" style="color:#B45309;">📊 发育评测</div>
+          <div class="rec-card-title">12月龄评测<br>上次：30天前</div>
+          <div class="rec-card-meta">剩余 5 分钟</div>
+        </div>
+        <div class="rec-card" style="background:#FCE7F3;">
+          <div class="rec-card-tag" style="color:#BE185D;">🏅 里程碑</div>
+          <div class="rec-card-title">宝宝会独站了！<br>记录这一刻</div>
+          <div class="rec-card-meta">+ 添加照片</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item active"><span class="tab-icon">🌱</span>首页</div>
+      <div class="tab-item"><span class="tab-icon">📈</span>成长</div>
+      <div class="tab-item"><span class="tab-icon">📋</span>评测</div>
+      <div class="tab-item"><span class="tab-icon">📚</span>课程</div>
+      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SCREEN 2: 发育评测报告
+       =================================================================== -->
+  <div class="phone s2">
+    <div class="status-bar"><span>9:41</span><span style="opacity:0.6">📶 📶 91%</span></div>
+    <div class="screen-content">
+
+      <div class="report-header a-1">
+        <div class="report-baby">小宝 · 12个月</div>
+        <div class="report-title">五大能区发育报告</div>
+        <div class="report-sub">基于国家卫健委 WS/T 580-2017</div>
+      </div>
+
+      <div class="dq-ring a-2">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <defs>
+            <linearGradient id="dqGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#52B788"/>
+              <stop offset="100%" stop-color="#2D6A4F"/>
+            </linearGradient>
+          </defs>
+          <circle class="dq-ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="dq-ring-fg" cx="60" cy="60" r="50"/>
+        </svg>
+        <div class="dq-center">
+          <div class="dq-number">105</div>
+          <div class="dq-unit">发育商</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin:-6px 0 4px;">
+        <span class="dq-level-badge">📈 发育正常 · 中等</span>
+      </div>
+
+      <div class="area-grid a-3">
+        <div class="area-card">
+          <div class="area-card-header">
+            <div class="area-name">🏃 大运动</div>
+            <div class="area-score" style="color:#15803D;">108</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:83%;background:#15803D;"></div></div>
+          <div class="area-status" style="color:#15803D;">✓ 良好</div>
+        </div>
+        <div class="area-card">
+          <div class="area-card-header">
+            <div class="area-name">✋ 精细动作</div>
+            <div class="area-score" style="color:#1D4ED8;">92</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:71%;background:#1D4ED8;"></div></div>
+          <div class="area-status" style="color:#1D4ED8;">⚠ 需加强</div>
+        </div>
+        <div class="area-card">
+          <div class="area-card-header">
+            <div class="area-name">🗣 语言</div>
+            <div class="area-score" style="color:#B45309;">108</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:83%;background:#B45309;"></div></div>
+          <div class="area-status" style="color:#B45309;">✓ 良好</div>
+        </div>
+        <div class="area-card">
+          <div class="area-card-header">
+            <div class="area-name">🧩 认知</div>
+            <div class="area-score" style="color:#7C3AED;">104</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:80%;background:#7C3AED;"></div></div>
+          <div class="area-status" style="color:#7C3AED;">✓ 中等</div>
+        </div>
+        <div class="area-card">
+          <div class="area-card-header">
+            <div class="area-name">🤝 社交</div>
+            <div class="area-score" style="color:#BE185D;">112</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:86%;background:#BE185D;"></div></div>
+          <div class="area-status" style="color:#BE185D;">✓ 良好</div>
+        </div>
+        <div class="area-card" style="background:linear-gradient(135deg,#D8F3DC,#F0FDF4);border-color:rgba(45,106,79,0.1);">
+          <div class="area-card-header">
+            <div class="area-name">📊 综合</div>
+            <div class="area-score" style="color:var(--green-800);">105</div>
+          </div>
+          <div class="area-bar"><div class="area-bar-fill" style="width:81%;background:var(--green-600);"></div></div>
+          <div class="area-status" style="color:var(--green-800);">🌟 发育均衡</div>
+        </div>
+      </div>
+
+      <div class="advice-card a-4">
+        <div class="advice-card-header">
+          <span>📌</span>
+          <span class="advice-card-title">基于评估的个性化建议</span>
+        </div>
+        <div class="advice-body">
+          <strong>优势：</strong>语言、大运动、社交发展良好<br>
+          <strong>提升方向：</strong>精细动作评分偏低（92），多提供捏豆、撕纸、翻书机会<br>
+          <strong>下次评测：</strong>建议 2026-08-10（15月龄）
+        </div>
+      </div>
+
+      <div class="action-row a-5">
+        <div class="action-btn primary">📋 完整报告</div>
+        <div class="action-btn secondary">📈 趋势对比</div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item"><span class="tab-icon">🌱</span>首页</div>
+      <div class="tab-item"><span class="tab-icon">📈</span>成长</div>
+      <div class="tab-item active"><span class="tab-icon">📋</span>评测</div>
+      <div class="tab-item"><span class="tab-icon">📚</span>课程</div>
+      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SCREEN 3: 成长数据
+       =================================================================== -->
+  <div class="phone s3">
+    <div class="status-bar"><span>9:41</span><span style="opacity:0.6">📶 📶 91%</span></div>
+    <div class="screen-content">
+
+      <div class="section-header a-1">
+        <span class="section-title">📈 生长曲线</span>
+        <span class="section-link">+ 记录</span>
+      </div>
+
+      <!-- Last 30 days mini calendar -->
+      <div class="mini-cal a-2">
+        <div class="cal-cell done">1</div>
+        <div class="cal-cell done">2</div>
+        <div class="cal-cell done">3</div>
+        <div class="cal-cell done">4</div>
+        <div class="cal-cell miss">5</div>
+        <div class="cal-cell done">6</div>
+        <div class="cal-cell done">7</div>
+        <div class="cal-cell done">8</div>
+        <div class="cal-cell done">9</div>
+        <div class="cal-cell today">10</div>
+      </div>
+
+      <div class="measure-row a-3">
+        <div class="measure-card">
+          <div class="measure-icon">📏</div>
+          <div class="measure-label">身高</div>
+          <div class="measure-value">76.5</div>
+          <div class="measure-unit">cm</div>
+          <div class="measure-percentile">P65</div>
+        </div>
+        <div class="measure-card">
+          <div class="measure-icon">⚖️</div>
+          <div class="measure-label">体重</div>
+          <div class="measure-value">10.2</div>
+          <div class="measure-unit">kg</div>
+          <div class="measure-percentile">P55</div>
+        </div>
+        <div class="measure-card">
+          <div class="measure-icon">🎯</div>
+          <div class="measure-label">头围</div>
+          <div class="measure-value">46.5</div>
+          <div class="measure-unit">cm</div>
+          <div class="measure-percentile">P60</div>
+        </div>
+      </div>
+
+      <div class="chart-card a-4">
+        <div class="chart-header">
+          <span class="chart-title">身高增长趋势</span>
+          <div class="chart-tabs">
+            <span class="chart-tab active">身高</span>
+            <span class="chart-tab">体重</span>
+            <span class="chart-tab">头围</span>
+          </div>
+        </div>
+        <div class="chart-svg-wrap">
+          <svg width="100%" height="170" viewBox="0 0 300 170" style="overflow:visible;">
+            <!-- Grid lines -->
+            <line x1="30" y1="30" x2="30" y2="150" stroke="#F0F0F0" stroke-width="1"/>
+            <line x1="30" y1="150" x2="290" y2="150" stroke="#F0F0F0" stroke-width="1"/>
+            <line x1="30" y1="90" x2="290" y2="90" stroke="#F5F5F5" stroke-width="1" stroke-dasharray="4,4"/>
+
+            <!-- WHO P97 reference -->
+            <polyline points="40,20 80,15 130,18 180,15 230,12 270,10"
+                      fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="272" y="12" font-size="8" fill="#9CA3AF">P97</text>
+
+            <!-- WHO P50 reference -->
+            <polyline points="40,65 80,60 130,55 180,50 230,45 270,42"
+                      fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="272" y="44" font-size="8" fill="#9CA3AF">P50</text>
+
+            <!-- WHO P3 reference -->
+            <polyline points="40,110 80,105 130,100 180,95 230,90 270,88"
+                      fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="272" y="90" font-size="8" fill="#9CA3AF">P3</text>
+
+            <!-- Baby data -->
+            <defs>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#52B788"/>
+                <stop offset="100%" stop-color="#2D6A4F"/>
+              </linearGradient>
+            </defs>
+            <polyline points="40,70 90,58 140,48 200,40 260,35"
+                      fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="70" r="4.5" fill="#2D6A4F"/>
+            <circle cx="90" cy="58" r="4.5" fill="#2D6A4F"/>
+            <circle cx="140" cy="48" r="4.5" fill="#2D6A4F"/>
+            <circle cx="200" cy="40" r="4.5" fill="#2D6A4F"/>
+            <circle cx="260" cy="35" r="6" fill="#2D6A4F" stroke="white" stroke-width="3"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="milestone-section a-5">
+        <div class="milestone-header">
+          <span class="milestone-title">🏅 成长里程碑</span>
+          <span class="section-link">+ 记录</span>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div>
+              <div class="tl-date">2026-05-08 · 2天前</div>
+              <div class="tl-text">👶 第一次独立站立超过 5 秒</div>
+              <span class="tl-tag" style="background:#D8F3DC;color:#2D6A4F;">大运动突破</span>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#F4A261;border-color:#FDEBD0;"></div>
+            <div>
+              <div class="tl-date">2026-05-01 · 9天前</div>
+              <div class="tl-text">🦷 长出第一颗牙（下中切牙）</div>
+              <span class="tl-tag" style="background:#FEF0D6;color:#B45309;">里程碑</span>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#48CAE4;border-color:#E0F7FA;"></div>
+            <div>
+              <div class="tl-date">2026-03-15</div>
+              <div class="tl-text">🔄 学会从俯卧翻回仰卧</div>
+              <span class="tl-tag" style="background:#E0F7FA;color:#0E7490;">运动发育</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item"><span class="tab-icon">🌱</span>首页</div>
+      <div class="tab-item active"><span class="tab-icon">📈</span>成长</div>
+      <div class="tab-item"><span class="tab-icon">📋</span>评测</div>
+      <div class="tab-item"><span class="tab-icon">📚</span>课程</div>
+      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SCREEN 4: 家长课程
+       =================================================================== -->
+  <div class="phone s4">
+    <div class="status-bar"><span>9:41</span><span style="opacity:0.6">📶 📶 91%</span></div>
+    <div class="screen-content">
+
+      <div class="section-header a-1">
+        <span class="section-title">📚 家长课程</span>
+        <span class="section-link">已购 3 节</span>
+      </div>
+
+      <div class="course-hero a-2">
+        <div class="course-hero-badge">🔥 根据评测推荐 · 精细动作需加强</div>
+        <div class="course-hero-title">1岁精细动作专项提升</div>
+        <div class="course-hero-sub">5 节课 · 共 45 分钟 · 专业儿童发展师授课</div>
+        <div class="course-hero-meta">
+          <span>VIP 免费</span>
+          <span>🔥 2341 人已学</span>
+        </div>
+      </div>
+
+      <div class="course-list-title a-3">
+        <span class="section-title">全部课程</span>
+      </div>
+
+      <div class="course-item a-3">
+        <div class="course-icon" style="background:#D8F3DC;">🗣</div>
+        <div class="course-info">
+          <div class="course-name">语言爆发期全攻略</div>
+          <div class="course-desc">3 节课 · 30 分钟 · 12-18 月龄</div>
+          <div class="course-badges"><span class="course-badge badge-free">免费</span></div>
+        </div>
+      </div>
+
+      <div class="course-item a-4">
+        <div class="course-icon" style="background:#DBEAFE;">😴</div>
+        <div class="course-info">
+          <div class="course-name">宝宝睡眠引导实战</div>
+          <div class="course-desc">7 节课 · 60 分钟 · 0-24 月龄</div>
+          <div class="course-badges"><span class="course-badge badge-vip">VIP</span><span class="course-badge badge-free" style="background:#F3F4F6;color:#6B7280;">¥49</span></div>
+        </div>
+      </div>
+
+      <div class="course-item a-4">
+        <div class="course-icon" style="background:#FCE7F3;">🍼</div>
+        <div class="course-info">
+          <div class="course-name">辅食添加全指导</div>
+          <div class="course-desc">6 节课 · 50 分钟 · 6-18 月龄</div>
+          <div class="course-badges"><span class="course-badge badge-free">免费</span></div>
+        </div>
+      </div>
+
+      <div class="course-item a-5">
+        <div class="course-icon" style="background:#FEF3C7;">🧸</div>
+        <div class="course-info">
+          <div class="course-name">0-3岁家长必修课</div>
+          <div class="course-desc">12 节课 · 120 分钟 · 系统科学育儿</div>
+          <div class="course-badges"><span class="course-badge badge-vip">VIP</span></div>
+        </div>
+      </div>
+
+      <div class="progress-summary a-5">
+        <div class="progress-icon">🏆</div>
+        <div>
+          <div class="progress-text">你已学习 8 节课</div>
+          <div class="progress-sub">坚持学习，科学育儿不焦虑</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item"><span class="tab-icon">🌱</span>首页</div>
+      <div class="tab-item"><span class="tab-icon">📈</span>成长</div>
+      <div class="tab-item"><span class="tab-icon">📋</span>评测</div>
+      <div class="tab-item active"><span class="tab-icon">📚</span>课程</div>
+      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SCREEN 5: 个人中心
+       =================================================================== -->
+  <div class="phone s5">
+    <div class="blob-bg" style="height:200px;"></div>
+    <div class="status-bar" style="background:transparent;"><span>9:41</span><span style="opacity:0.6">📶 📶 91%</span></div>
+    <div class="screen-content">
+
+      <div class="profile-card a-1">
+        <div class="profile-avatar">👩</div>
+        <div>
+          <div class="profile-name-big">小树妈妈</div>
+          <div class="profile-days">已陪伴小宝 365 天</div>
+        </div>
+        <div class="profile-edit">编辑</div>
+      </div>
+
+      <div class="vip-card a-2">
+        <div class="vip-row">
+          <div>
+            <div class="vip-label">当前会员</div>
+            <div class="vip-plan">年度 VIP</div>
+            <div class="vip-expire">到期：2026-12-31 · 还剩 235 天</div>
+          </div>
+          <div class="vip-tag">
+            <div class="vip-tag-main">VIP</div>
+            <div class="vip-tag-sub">已省 ¥168</div>
+          </div>
+        </div>
+        <div class="vip-features">
+          <span class="vip-feature">📊 无限次评测</span>
+          <span class="vip-feature">📚 全部课程免费</span>
+          <span class="vip-feature">📈 深度报告</span>
+        </div>
+      </div>
+
+      <div class="menu-grid a-3">
+        <div class="menu-item">
+          <div class="menu-icon">👶</div>
+          <div class="menu-label">宝宝档案</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon">📊</div>
+          <div class="menu-label">成长周报</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon">🔔</div>
+          <div class="menu-label">消息提醒</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon">⚙️</div>
+          <div class="menu-label">设置</div>
+        </div>
+      </div>
+
+      <div class="list-group a-4">
+        <div class="list-item">
+          <div class="list-item-left"><span>📱</span> 邀请好友</div>
+          <span class="list-arrow">›</span>
+        </div>
+        <div class="list-item">
+          <div class="list-item-left"><span>💬</span> 意见反馈</div>
+          <span class="list-arrow">›</span>
+        </div>
+        <div class="list-item">
+          <div class="list-item-left"><span>📖</span> 使用指南</div>
+          <span class="list-arrow">›</span>
+        </div>
+        <div class="list-item" style="border-bottom:none;">
+          <div class="list-item-left"><span>📋</span> 关于我们</div>
+          <span class="list-arrow">›</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item"><span class="tab-icon">🌱</span>首页</div>
+      <div class="tab-item"><span class="tab-icon">📈</span>成长</div>
+      <div class="tab-item"><span class="tab-icon">📋</span>评测</div>
+      <div class="tab-item"><span class="tab-icon">📚</span>课程</div>
+      <div class="tab-item active"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:36px;text-align:center;color:var(--text-tertiary);font-size:13px;line-height:1.8;">
+  <p>🎨 设计系统：有机自然风 · 主色 #2D6A4F · 强调色 #F4A261 · 字体 ZCOOL QingKe HuangYou + Noto Sans SC</p>
+  <p>💻 用浏览器打开即可查看 · 双击屏幕可放大查看细节</p>
+  <p>
+    <span style="display:inline-block;padding:4px 14px;background:#D8F3DC;color:#2D6A4F;border-radius:20px;font-weight:600;">← 上一版 &nbsp; screens.html</span>
+    <span style="display:inline-block;margin:0 8px;">vs</span>
+    <span style="display:inline-block;padding:4px 14px;background:#2D6A4F;color:white;border-radius:20px;font-weight:600;">✨ 新版 &nbsp; screens_v2.html</span>
+  </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+class BabyModel {
+  final int id;
+  final int userId;
+  final String name;
+  final int gender; // 0=女, 1=男
+  final DateTime birthDate;
+  final bool isPremature;
+  final String? avatarUrl;
+
+  BabyModel({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.gender,
+    required this.birthDate,
+    this.isPremature = false,
+    this.avatarUrl,
+  });
+
+  int get ageInMonths {
+    final now = DateTime.now();
+    final months = (now.year - birthDate.year) * 12 +
+        (now.month - birthDate.month);
+    if (now.day < birthDate.day) return months - 1;
+    return months;
+  }
+
+  String get ageDisplay {
+    final m = ageInMonths;
+    if (m < 12) return '$m个月';
+    final y = m ~/ 12;
+    final rm = m % 12;
+    return '$y岁${rm > 0 ? '$rm个月' : ''}';
+  }
+
+  factory BabyModel.fromJson(Map<String, dynamic> json) {
+    return BabyModel(
+      id: json['id'],
+      userId: json['user_id'],
+      name: json['name'],
+      gender: json['gender'],
+      birthDate: DateTime.parse(json['birth_date']),
+      isPremature: json['is_premature'] ?? false,
+      avatarUrl: json['avatar_url'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'user_id': userId,
+    'name': name,
+    'gender': gender,
+    'birth_date':
+        '${birthDate.year}-${birthDate.month.toString().padLeft(2, '0')}-${birthDate.day.toString().padLeft(2, '0')}',
+    'is_premature': isPremature,
+    'avatar_url': avatarUrl,
+  };
+}
