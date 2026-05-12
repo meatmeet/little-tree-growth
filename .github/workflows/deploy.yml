@@ -45,5 +45,5 @@ jobs:
             git pull origin main
             cd server
             npm ci --omit=dev
-            npx prisma migrate deploy 2>/dev/null || node src/migrate.js
+            node src/migrate.js
             pm2 restart little-tree-server || pm2 start src/index.js --name little-tree-server
