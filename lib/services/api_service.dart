@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
+import 'secure_storage_service.dart';
 import 'storage_service.dart';
 
 class ApiException implements Exception {
@@ -14,13 +16,20 @@ class ApiException implements Exception {
   String toString() => 'ApiException($statusCode): $message';
 }
 
+class AuthRequiredException extends ApiException {
+  AuthRequiredException([String message = '登录已过期，请重新登录'])
+      : super(401, message);
+}
+
 class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
 
   final StorageService _storage = StorageService();
+  final SecureStorageService _secureStorage = SecureStorageService();
   String? _token;
+  VoidCallback? onAuthRequired;
 
   String get baseUrl => AppConstants.apiBaseUrl;
 
@@ -38,14 +47,14 @@ class ApiService {
   Future<void> setToken(String? token) async {
     _token = token;
     if (token != null) {
-      await _storage.setString(AppConstants.tokenKey, token);
+      await _secureStorage.setString(AppConstants.tokenKey, token);
     } else {
-      await _storage.remove(AppConstants.tokenKey);
+      await _secureStorage.remove(AppConstants.tokenKey);
     }
   }
 
   Future<void> loadToken() async {
-    _token = _storage.getString(AppConstants.tokenKey);
+    _token = await _secureStorage.getString(AppConstants.tokenKey);
   }
 
   bool get hasToken => _token != null;
@@ -125,6 +134,7 @@ class ApiService {
 
     if (response.statusCode == 401) {
       setToken(null);
+      onAuthRequired?.call();
     }
 
     throw ApiException(response.statusCode, message);

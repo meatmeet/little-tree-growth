@@ -145,6 +145,14 @@ class AppTheme {
     }
   }
 
+  static Color dqColor(double dq) {
+    if (dq >= 130) return success;
+    if (dq >= 110) return primaryLight;
+    if (dq >= 80) return warm;
+    if (dq >= 70) return Colors.deepOrange;
+    return danger;
+  }
+
   static String getAreaName(String area) {
     switch (area) {
       case 'gross_motor':

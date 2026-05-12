@@ -219,10 +219,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
-                child: Text(
-                  baby.avatarUrl ?? '👶',
-                  style: const TextStyle(fontSize: 22),
-                ),
+                child: baby.avatarUrl != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        baby.avatarUrl!,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Text('👶', style: TextStyle(fontSize: 22)),
+                      ),
+                    )
+                  : const Text('👶', style: TextStyle(fontSize: 22)),
               ),
             ),
             const SizedBox(width: 12),

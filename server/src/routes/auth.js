@@ -31,12 +31,20 @@ router.post('/login', validate({
   phone: { required: true }, password: { required: true },
 }), async (req, res) => {
   try {
-    const { phone, password } = req.body;
-    const user = queryOne('SELECT * FROM users WHERE phone = ?', [phone]);
-    if (!user) return res.status(400).json(fail('手机号未注册'));
+    let { phone, password } = req.body;
+    phone = phone.trim();
+    let user = queryOne('SELECT * FROM users WHERE phone = ?', [phone]);
 
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return res.status(400).json(fail('密码错误'));
+    // Auto-register if user does not exist
+    if (!user) {
+      const hash = await bcrypt.hash(password, 10);
+      const result = query('INSERT INTO users (phone, password_hash, nickname) VALUES (?,?,?)', [phone, hash, phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')]);
+      user = queryOne('SELECT * FROM users WHERE phone = ?', [phone]);
+      if (!user) return res.status(500).json(fail('注册失败'));
+    } else {
+      const valid = await bcrypt.compare(password, user.password_hash);
+      if (!valid) return res.status(400).json(fail('密码错误'));
+    }
 
     const token = generateToken({ id: user.id, phone: user.phone });
     const { password_hash, ...safe } = user;

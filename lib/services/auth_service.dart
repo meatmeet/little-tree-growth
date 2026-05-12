@@ -1,4 +1,5 @@
 import 'api_service.dart';
+import 'secure_storage_service.dart';
 import 'storage_service.dart';
 import '../models/user.dart';
 import '../utils/constants.dart';
@@ -10,6 +11,7 @@ class AuthService {
 
   final ApiService _api = ApiService();
   final StorageService _storage = StorageService();
+  final SecureStorageService _secureStorage = SecureStorageService();
 
   UserModel? _currentUser;
   UserModel? get currentUser => _currentUser;
@@ -19,7 +21,7 @@ class AuthService {
   Future<void> init() async {
     await _api.loadToken();
     if (_api.hasToken) {
-      final data = _storage.getJson(AppConstants.userKey);
+      final data = await _secureStorage.getJson(AppConstants.userKey);
       if (data != null) {
         _currentUser = UserModel.fromJson(data);
       }
@@ -34,7 +36,7 @@ class AuthService {
     final data = res['data'] as Map<String, dynamic>;
     await _api.setToken(data['token'] as String?);
     _currentUser = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-    await _storage.setJson(AppConstants.userKey,
+    await _secureStorage.setJson(AppConstants.userKey,
         (_currentUser!.toJson()));
     return _currentUser!;
   }
@@ -49,14 +51,14 @@ class AuthService {
   Future<void> logout() async {
     _currentUser = null;
     await _api.setToken(null);
-    await _storage.remove(AppConstants.userKey);
+    await _secureStorage.remove(AppConstants.userKey);
   }
 
   Future<UserModel> updateProfile(Map<String, dynamic> profileData) async {
     final res = await _api.put('/user/profile', body: profileData);
     final data = res['data'] as Map<String, dynamic>;
     _currentUser = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-    await _storage.setJson(AppConstants.userKey,
+    await _secureStorage.setJson(AppConstants.userKey,
         (_currentUser!.toJson()));
     return _currentUser!;
   }

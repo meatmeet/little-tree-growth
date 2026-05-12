@@ -38,7 +38,7 @@ class GrowthProvider extends ChangeNotifier {
       _cacheRecords();
     } catch (e) {
       _error = e.toString();
-      final cached = _storage.getList('${AppConstants.taskKey}_growth');
+      final cached = _storage.getList(AppConstants.growthCacheKey);
       if (cached != null) {
         _records = cached
             .map((e) => GrowthRecord.fromJson(e as Map<String, dynamic>))
@@ -90,7 +90,7 @@ class GrowthProvider extends ChangeNotifier {
       _cacheMilestones();
     } catch (e) {
       _error = e.toString();
-      final cached = _storage.getList('${AppConstants.taskKey}_milestones');
+      final cached = _storage.getList(AppConstants.milestoneCacheKey);
       if (cached != null) {
         _milestones = cached
             .map((e) => Milestone.fromJson(e as Map<String, dynamic>))
@@ -127,14 +127,14 @@ class GrowthProvider extends ChangeNotifier {
 
   void _cacheRecords() {
     _storage.setList(
-      '${AppConstants.taskKey}_growth',
+      AppConstants.growthCacheKey,
       _records.map((r) => r.toJson()).toList(),
     );
   }
 
   void _cacheMilestones() {
     _storage.setList(
-      '${AppConstants.taskKey}_milestones',
+      AppConstants.milestoneCacheKey,
       _milestones.map((m) => m.toJson()).toList(),
     );
   }

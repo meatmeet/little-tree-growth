@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final ApiService _api = ApiService();
 
   UserModel? _user;
   bool _loading = false;
@@ -21,7 +23,12 @@ class AuthProvider extends ChangeNotifier {
     await _authService.init();
     _user = _authService.currentUser;
     _initialized = true;
+    _api.onAuthRequired = _onAuthRequired;
     notifyListeners();
+  }
+
+  void _onAuthRequired() {
+    logout();
   }
 
   Future<bool> login(String phone, String code) async {

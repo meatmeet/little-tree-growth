@@ -25,8 +25,8 @@ class AssessmentDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    _dqColor(assessment.overallDq!),
-                    _dqColor(assessment.overallDq!).withOpacity(0.7),
+                    AppTheme.dqColor(assessment.overallDq!),
+                    AppTheme.dqColor(assessment.overallDq!).withOpacity(0.7),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -186,11 +186,4 @@ class AssessmentDetailScreen extends StatelessWidget {
     );
   }
 
-  Color _dqColor(double dq) {
-    if (dq >= 130) return AppTheme.success;
-    if (dq >= 110) return AppTheme.primaryLight;
-    if (dq >= 80) return AppTheme.warning;
-    if (dq >= 70) return Colors.deepOrange;
-    return AppTheme.danger;
-  }
 }

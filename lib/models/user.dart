@@ -24,7 +24,7 @@ class UserModel {
       email: json['email'],
       nickname: json['nickname'],
       avatarUrl: json['avatar_url'],
-      isVip: json['is_vip'] ?? false,
+      isVip: json['is_vip'] == 1 || json['is_vip'] == true,
       vipExpireAt: json['vip_expire_at'] != null
           ? DateTime.parse(json['vip_expire_at'])
           : null,

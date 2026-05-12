@@ -19,10 +19,18 @@ class BabyModel {
 
   int get ageInMonths {
     final now = DateTime.now();
+    if (birthDate.isAfter(now)) return 0;
     final months = (now.year - birthDate.year) * 12 +
         (now.month - birthDate.month);
     if (now.day < birthDate.day) return months - 1;
     return months;
+  }
+
+  /// Corrected age for premature babies.
+  /// [gestationalWeeks] is the number of weeks at birth (normally 40).
+  int correctedAgeInMonths(int gestationalWeeks) {
+    final raw = ageInMonths - (40 - gestationalWeeks);
+    return raw < 0 ? 0 : raw;
   }
 
   String get ageDisplay {

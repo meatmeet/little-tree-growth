@@ -22,8 +22,8 @@ void main() async {
   try {
     await StorageService().init();
     await ApiService().loadToken();
-  } catch (_) {
-    // Silently continue; app works in offline/guest mode
+  } catch (e) {
+    debugPrint('Initialization error: $e');
   }
 
   runApp(

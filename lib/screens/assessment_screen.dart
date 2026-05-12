@@ -220,7 +220,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _dqColor(assessment.overallDq!).withOpacity(0.1),
+                      color: AppTheme.dqColor(assessment.overallDq!).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -230,14 +230,14 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: _dqColor(assessment.overallDq!),
+                            color: AppTheme.dqColor(assessment.overallDq!),
                           ),
                         ),
                         Text(
                           assessment.dqLevel,
                           style: TextStyle(
                             fontSize: 10,
-                            color: _dqColor(assessment.overallDq!),
+                            color: AppTheme.dqColor(assessment.overallDq!),
                           ),
                         ),
                       ],
@@ -326,13 +326,6 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     }
   }
 
-  Color _dqColor(double dq) {
-    if (dq >= 130) return AppTheme.success;
-    if (dq >= 110) return AppTheme.primaryLight;
-    if (dq >= 80) return AppTheme.warning;
-    if (dq >= 70) return Colors.deepOrange;
-    return AppTheme.danger;
-  }
 
   int _getStandardAgeGroup(int months) {
     if (months <= 12) return months;

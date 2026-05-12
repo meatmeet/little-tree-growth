@@ -274,7 +274,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 }
 
-const _demoCourses = [
+const List<Map<String, Object?>> _demoCourses = [
   {'title': '感官探索', 'subtitle': '视觉、听觉、触觉综合开发', 'progress': 60},
   {'title': '亲子互动', 'subtitle': '增进亲子关系的趣味游戏', 'progress': 30},
   {'title': '音乐律动', 'subtitle': '节奏感与音乐欣赏能力培养', 'progress': 0},

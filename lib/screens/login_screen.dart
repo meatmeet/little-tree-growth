@@ -11,8 +11,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _phoneController = TextEditingController(text: '13800138000');
-  final _codeController = TextEditingController(text: '123456');
+  final _phoneController = TextEditingController();
+  final _codeController = TextEditingController();
   bool _sendingCode = false;
 
   @override

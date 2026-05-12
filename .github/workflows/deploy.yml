@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+
+jobs:
+  build-flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ~/little-tree-growth
+            git pull origin main
+            cd server
+            npm ci --omit=dev
+            npx prisma migrate deploy 2>/dev/null || node src/migrate.js
+            pm2 restart little-tree-server || pm2 start src/index.js --name little-tree-server

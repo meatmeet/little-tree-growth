@@ -1,6 +1,6 @@
 class AppConstants {
   static const String appName = '小树成长';
-  static const String apiBaseUrl = 'http://www.meetmeat.com.cn/api/v1';
+  static const String apiBaseUrl = 'https://www.meetmeat.com.cn/api/v1';
 
   // Default values
   static const double defaultTaskDuration = 15;
@@ -17,6 +17,8 @@ class AppConstants {
   static const String babyKey = 'baby_data';
   static const String taskKey = 'task_cache';
   static const String assessmentKey = 'assessment_cache';
+  static const String growthCacheKey = 'growth_data';
+  static const String milestoneCacheKey = 'milestone_data';
   static const String settingsKey = 'app_settings';
 
   // Assessment
