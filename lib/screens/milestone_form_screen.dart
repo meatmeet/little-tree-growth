@@ -94,9 +94,9 @@ class _MilestoneFormScreenState extends State<MilestoneFormScreen> {
             spacing: 8,
             runSpacing: 8,
             children: _types.map((t) {
-              final key = t['key']! as String;
-              final label = t['label']! as String;
-              final icon = t['icon']! as String;
+              final key = t['key']!;
+              final label = t['label']!;
+              final icon = t['icon']!;
               final selected = _selectedType == key;
               return GestureDetector(
                 onTap: () => setState(() => _selectedType = key),

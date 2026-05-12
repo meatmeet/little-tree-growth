@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 import 'secure_storage_service.dart';
-import 'storage_service.dart';
 
 class ApiException implements Exception {
   final int statusCode;
@@ -26,7 +25,6 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
-  final StorageService _storage = StorageService();
   final SecureStorageService _secureStorage = SecureStorageService();
   String? _token;
   VoidCallback? onAuthRequired;

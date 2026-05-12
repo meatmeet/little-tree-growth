@@ -1,6 +1,5 @@
 import 'api_service.dart';
 import 'secure_storage_service.dart';
-import 'storage_service.dart';
 import '../models/user.dart';
 import '../utils/constants.dart';
 
@@ -10,7 +9,6 @@ class AuthService {
   AuthService._internal();
 
   final ApiService _api = ApiService();
-  final StorageService _storage = StorageService();
   final SecureStorageService _secureStorage = SecureStorageService();
 
   UserModel? _currentUser;

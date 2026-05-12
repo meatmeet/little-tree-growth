@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   '0-6岁家庭智力发展平台',
                   style: TextStyle(
                     fontSize: 14,
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   '未注册的手机号将在登录后自动注册',
                   style: TextStyle(
                     fontSize: 12,

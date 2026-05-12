@@ -107,7 +107,6 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -220,7 +219,7 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
               Switch(
                 value: _isPremature,
                 onChanged: _togglePremature,
-                activeColor: AppTheme.primary,
+                activeTrackColor: AppTheme.primary,
               ),
             ],
           ),

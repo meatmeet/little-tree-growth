@@ -18,7 +18,7 @@ class StreakCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppTheme.primary,
             AppTheme.primaryLight,
@@ -47,9 +47,9 @@ class StreakCard extends StatelessWidget {
               const Spacer(),
               if (totalDays > 0)
                 Text(
-                  '共${totalDays}天',
+                  '共$totalDays天',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -87,7 +87,7 @@ class StreakCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Row(

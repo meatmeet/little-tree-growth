@@ -27,9 +27,9 @@ class AreaCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
+          color: color.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +52,7 @@ class AreaCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -71,7 +71,7 @@ class AreaCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: pct / 100,
-                backgroundColor: color.withOpacity(0.15),
+                backgroundColor: color.withValues(alpha: 0.15),
                 valueColor: AlwaysStoppedAnimation<Color>(color),
                 minHeight: 6,
               ),
@@ -81,7 +81,7 @@ class AreaCard extends StatelessWidget {
               '${pct.toStringAsFixed(0)}%',
               style: TextStyle(
                 fontSize: 11,
-                color: color.withOpacity(0.7),
+                color: color.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),

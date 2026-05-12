@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:little_tree_growth/services/api_service.dart';
-import 'package:little_tree_growth/utils/constants.dart';
 
 void main() {
   group('ApiService', () {

@@ -42,9 +42,6 @@ class _GrowthScreenState extends State<GrowthScreen>
   @override
   Widget build(BuildContext context) {
     final baby = context.watch<BabyProvider>().currentBaby;
-    final growth = context.watch<GrowthProvider>();
-    final latest = growth.latestRecord;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('成长记录'),
@@ -272,7 +269,7 @@ class _MilestonesTab extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               border: Border.all(
-                color: AppTheme.primary.withOpacity(0.3),
+                color: AppTheme.primary.withValues(alpha: 0.3),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(14),
@@ -390,9 +387,9 @@ class _ChartsTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'WHO 生长标准',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.textSecondary,
                   ),

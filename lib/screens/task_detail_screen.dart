@@ -24,9 +24,9 @@ class TaskDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: areaColor.withOpacity(0.06),
+              color: areaColor.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: areaColor.withOpacity(0.15)),
+              border: Border.all(color: areaColor.withValues(alpha: 0.15)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,9 +138,9 @@ class TaskDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppTheme.info.withOpacity(0.06),
+                color: AppTheme.info.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.info.withOpacity(0.15)),
+                border: Border.all(color: AppTheme.info.withValues(alpha: 0.15)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

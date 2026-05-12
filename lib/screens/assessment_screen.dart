@@ -59,7 +59,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
+                        color: AppTheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(
@@ -183,7 +183,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getStatusColor(assessment.status).withOpacity(0.1),
+                    color: _getStatusColor(assessment.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -220,7 +220,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppTheme.dqColor(assessment.overallDq!).withOpacity(0.1),
+                      color: AppTheme.dqColor(assessment.overallDq!).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -248,7 +248,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppTheme.warning.withOpacity(0.1),
+                      color: AppTheme.warning.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(

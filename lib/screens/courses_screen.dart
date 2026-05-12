@@ -44,7 +44,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
+                      color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
@@ -135,7 +135,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
             title: '认知启蒙',
             subtitle: '通过游戏激发宝宝的好奇心与探索欲',
             color: AppTheme.areaAdaptation,
-            onTap: () => pushScreen(context, CourseDetailScreen(
+            onTap: () => pushScreen(context, const CourseDetailScreen(
               title: '认知启蒙',
               subtitle: '通过游戏激发宝宝的好奇心与探索欲',
               ageRange: '0-3岁',
@@ -148,7 +148,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
             title: '大运动发展',
             subtitle: '从翻身到走路，逐步提升运动能力',
             color: AppTheme.areaGrossMotor,
-            onTap: () => pushScreen(context, CourseDetailScreen(
+            onTap: () => pushScreen(context, const CourseDetailScreen(
               title: '大运动发展',
               subtitle: '从翻身到走路，逐步提升运动能力',
               ageRange: '0-6岁',
@@ -161,7 +161,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
             title: '语言启蒙',
             subtitle: '听说读写全方位语言能力培养',
             color: AppTheme.areaLanguage,
-            onTap: () => pushScreen(context, CourseDetailScreen(
+            onTap: () => pushScreen(context, const CourseDetailScreen(
               title: '语言启蒙',
               subtitle: '听说读写全方位语言能力培养',
               ageRange: '0-6岁',
@@ -215,9 +215,9 @@ class _CoursesScreenState extends State<CoursesScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
+          color: color.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
@@ -225,7 +225,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(

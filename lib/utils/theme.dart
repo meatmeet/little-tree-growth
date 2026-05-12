@@ -32,12 +32,12 @@ class AppTheme {
   // Shadows
   static List<BoxShadow> get shadowSm => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.04),
+      color: Colors.black.withValues(alpha: 0.04),
       blurRadius: 3,
       offset: const Offset(0, 1),
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.03),
+      color: Colors.black.withValues(alpha: 0.03),
       blurRadius: 2,
       offset: const Offset(0, 1),
     ),
@@ -45,12 +45,12 @@ class AppTheme {
 
   static List<BoxShadow> get shadowMd => [
     BoxShadow(
-      color: Colors.black.withOpacity(0.06),
+      color: Colors.black.withValues(alpha: 0.06),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.04),
+      color: Colors.black.withValues(alpha: 0.04),
       blurRadius: 4,
       offset: const Offset(0, 2),
     ),
@@ -61,7 +61,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: 'Noto Sans SC',
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: primary,
         secondary: warm,
         surface: bgWarm,

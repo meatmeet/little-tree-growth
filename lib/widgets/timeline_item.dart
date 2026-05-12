@@ -39,7 +39,7 @@ class TimelineItem extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: dotColor.withOpacity(0.12),
+                      color: dotColor.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -50,7 +50,7 @@ class TimelineItem extends StatelessWidget {
                     Expanded(
                       child: Container(
                         width: 2,
-                        color: dotColor.withOpacity(0.15),
+                        color: dotColor.withValues(alpha: 0.15),
                       ),
                     ),
                 ],

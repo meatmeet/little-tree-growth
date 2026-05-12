@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:little_tree_growth/providers/auth_provider.dart';
-import 'package:little_tree_growth/models/user.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthProvider extends Mock implements AuthProvider {}
