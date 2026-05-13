@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../utils/theme.dart';
 import '../utils/navigation.dart';
 import '../models/growth_record.dart';
@@ -259,6 +261,9 @@ class _MilestonesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final growth = context.watch<GrowthProvider>();
+    final milestones = growth.milestones;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -306,7 +311,24 @@ class _MilestonesTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Timeline
-        _emptyMilestones(),
+        if (milestones.isEmpty) ...[
+          _emptyMilestones(),
+        ] else ...[
+          ...milestones.asMap().entries.map((entry) {
+            final i = entry.key;
+            final m = entry.value;
+            return TimelineItem(
+              icon: m.typeIcon,
+              title: m.typeLabel,
+              subtitle: m.notes,
+              time: m.occurredAt != null
+                  ? '${m.occurredAt!.month}/${m.occurredAt!.day}'
+                  : null,
+              isLast: i == milestones.length - 1,
+              color: AppTheme.primary,
+            );
+          }),
+        ],
       ],
     );
   }
@@ -350,83 +372,49 @@ class _ChartsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final growth = context.watch<GrowthProvider>();
+    final records = growth.records;
+    final sorted = List<GrowthRecord>.from(records)
+      ..sort((a, b) => a.recordDate.compareTo(b.recordDate));
+
+    final hasHeight = sorted.any((r) => r.heightCm != null);
+    final hasWeight = sorted.any((r) => r.weightKg != null);
+    final hasHead = sorted.any((r) => r.headCircCm != null);
+
     final areas = ['gross_motor', 'fine_motor', 'language', 'adaptation', 'social'];
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          '生长曲线',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
-          ),
-        ),
+        const Text('生长曲线', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
         const SizedBox(height: 10),
 
-        // Chart placeholders
-        ...['身高', '体重', '头围'].map((label) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppTheme.bgCard,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: AppTheme.shadowSm,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$label生长曲线',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'WHO 生长标准',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: AppTheme.bgMuted,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '📈 图表区域',
-                      style: TextStyle(
-                        color: AppTheme.textTertiary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )),
-
-        const SizedBox(height: 20),
-
-        // Developmental Area Radar
-        const Text(
-          '发育评估概览',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
-          ),
+        _GrowthChartPanel(
+          label: '身高', unit: 'cm', color: AppTheme.primary,
+          records: sorted, hasData: hasHeight,
+          extractY: (r) => r.heightCm,
         ),
+
+        const SizedBox(height: 12),
+
+        _GrowthChartPanel(
+          label: '体重', unit: 'kg', color: AppTheme.warm,
+          records: sorted, hasData: hasWeight,
+          extractY: (r) => r.weightKg,
+        ),
+
+        const SizedBox(height: 12),
+
+        _GrowthChartPanel(
+          label: '头围', unit: 'cm', color: AppTheme.info,
+          records: sorted, hasData: hasHead,
+          extractY: (r) => r.headCircCm,
+        ),
+
+        const SizedBox(height: 24),
+
+        // Developmental Area Radar (placeholder — real data comes from assessments)
+        const Text('发育评估概览', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(14),
@@ -438,57 +426,28 @@ class _ChartsTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '五大能区',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
+              const Text('五大能区', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
               const SizedBox(height: 12),
               ...areas.map((area) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   children: [
-                    Text(
-                      AppTheme.getAreaIcon(area),
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    Text(AppTheme.getAreaIcon(area), style: const TextStyle(fontSize: 16)),
                     const SizedBox(width: 8),
-                    SizedBox(
-                      width: 60,
-                      child: Text(
-                        AppTheme.getAreaName(area),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ),
+                    SizedBox(width: 60, child: Text(AppTheme.getAreaName(area), style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary))),
                     const SizedBox(width: 8),
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(3),
                         child: LinearProgressIndicator(
-                          value: 0,
-                          backgroundColor: AppTheme.bgMuted,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppTheme.getAreaColor(area),
-                          ),
+                          value: 0, backgroundColor: AppTheme.bgMuted,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.getAreaColor(area)),
                           minHeight: 6,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      '--',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textTertiary,
-                      ),
-                    ),
+                    const Text('--', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textTertiary)),
                   ],
                 ),
               )),
@@ -498,6 +457,153 @@ class _ChartsTab extends StatelessWidget {
 
         const SizedBox(height: 24),
       ],
+    );
+  }
+}
+
+// ---- Extracted chart panel widget ----
+class _GrowthChartPanel extends StatelessWidget {
+  final String label;
+  final String unit;
+  final Color color;
+  final List<GrowthRecord> records;
+  final bool hasData;
+  final double? Function(GrowthRecord) extractY;
+
+  const _GrowthChartPanel({
+    required this.label,
+    required this.unit,
+    required this.color,
+    required this.records,
+    required this.hasData,
+    required this.extractY,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.bgCard,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: AppTheme.shadowSm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$label生长曲线', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const SizedBox(height: 4),
+          const Text('WHO 生长标准', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 180,
+            child: hasData ? _buildChart() : _emptyChart(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyChart() {
+    return Container(
+      decoration: BoxDecoration(color: AppTheme.bgMuted, borderRadius: BorderRadius.circular(10)),
+      child: const Center(child: Text('暂无数据', style: TextStyle(color: AppTheme.textTertiary, fontSize: 14))),
+    );
+  }
+
+  Widget _buildChart() {
+    final points = <FlSpot>[];
+    final dateLabels = <int, String>{};
+    for (int i = 0; i < records.length; i++) {
+      final y = extractY(records[i]);
+      if (y != null) {
+        points.add(FlSpot(i.toDouble(), y));
+        dateLabels[i] = DateFormat('M/d').format(records[i].recordDate);
+      }
+    }
+
+    if (points.isEmpty) return _emptyChart();
+
+    final values = points.map((p) => p.y).toList();
+    final yMin = (values.reduce((a, b) => a < b ? a : b) - (label == '体重' ? 1 : 3)).clamp(0, 999);
+    final yMax = (values.reduce((a, b) => a > b ? a : b) + (label == '体重' ? 1 : 3)).clamp(1, 999);
+    final yRange = yMax - yMin;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8, top: 8),
+      child: LineChart(
+        LineChartData(
+          minY: yMin,
+          maxY: yMax,
+          gridData: FlGridData(
+            show: true, drawHorizontalLine: true, drawVerticalLine: false,
+            horizontalInterval: yRange > 10 ? 5 : (yRange > 5 ? 2 : 1),
+            getDrawingHorizontalLine: (value) => FlLine(color: AppTheme.bgMuted, strokeWidth: 1),
+          ),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true, reservedSize: 24, interval: 1,
+                getTitlesWidget: (value, meta) {
+                  final idx = value.toInt();
+                  final label = dateLabels[idx];
+                  if (label == null) return const SizedBox.shrink();
+                  if (points.length > 4 && idx != 0 && idx != points.length - 1 && idx != points.length ~/ 2) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.textTertiary)),
+                  );
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true, reservedSize: 40,
+                interval: yRange > 10 ? 5 : (yRange > 5 ? 2 : 1),
+                getTitlesWidget: (value, meta) {
+                  if (value == meta.min || value == meta.max) return const SizedBox.shrink();
+                  return Text(value.toStringAsFixed(value > 10 ? 0 : 1), style: const TextStyle(fontSize: 10, color: AppTheme.textTertiary));
+                },
+              ),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: points,
+              isCurved: true, curveSmoothness: 0.3, color: color,
+              barWidth: 2.5, isStrokeCapRound: true,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                  radius: 3, color: color, strokeWidth: 1.5, strokeColor: Colors.white,
+                ),
+              ),
+              belowBarData: BarAreaData(show: true, color: color.withValues(alpha: 0.08)),
+            ),
+          ],
+          lineTouchData: LineTouchData(
+            enabled: true,
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipItems: (touchedSpots) {
+                return touchedSpots.map((spot) {
+                  final idx = spot.spotIndex;
+                  final d = idx < records.length ? DateFormat('M/d').format(records[idx].recordDate) : '';
+                  return LineTooltipItem(
+                    '$d\n${spot.y.toStringAsFixed(1)}',
+                    const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+        ),
+        duration: const Duration(milliseconds: 300),
+      ),
     );
   }
 }

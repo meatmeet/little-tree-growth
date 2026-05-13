@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'utils/theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/baby_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/assessment_screen.dart';
 import 'screens/growth_screen.dart';
@@ -35,8 +36,11 @@ class _AppGateState extends State<_AppGate> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthProvider>().checkAuth();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<AuthProvider>().checkAuth();
+      if (context.mounted && context.read<AuthProvider>().isLoggedIn) {
+        context.read<BabyProvider>().loadBabies();
+      }
     });
   }
 

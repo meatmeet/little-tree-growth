@@ -25,7 +25,8 @@ export function query(sql, params = []) {
   const d = getDb();
   const stmt = d.prepare(sql);
   const trimmed = sql.trim().toUpperCase();
-  if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH') || trimmed.startsWith('RETURNING')) {
+  const hasReturning = /\bRETURNING\b/i.test(sql);
+  if (trimmed.startsWith('SELECT') || trimmed.startsWith('WITH') || hasReturning) {
     const rows = stmt.all(...params);
     return { rows };
   }
@@ -215,7 +216,7 @@ function seedIfEmpty() {
     // Demo user (password: 123456)
     // Pre-computed bcrypt hash for '123456'
     db.prepare(`INSERT INTO users (phone, password_hash, nickname, is_vip) VALUES (?,?,?,1)`).run(
-      '13800138000', '$2a$10$dummyhashdonotuse', '测试用户'
+      '13800138000', '$2a$10$Cj183oMqPjrDE90s0Np1.eje13b0MIcOEvfXKrMvwEp/4XF5qwUP6', '测试用户'
     );
 
     // Demo baby

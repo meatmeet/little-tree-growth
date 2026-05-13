@@ -68,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: StreakCard(
                 streakDays: taskProvider.streakDays,
-                totalDays: taskProvider.streakDays,
                 onCheckin: () => taskProvider.checkin(),
               ),
             ),

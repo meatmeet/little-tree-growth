@@ -9,6 +9,7 @@ import 'providers/baby_provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/assessment_provider.dart';
 import 'providers/growth_provider.dart';
+import 'providers/course_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TaskProvider()),
         ChangeNotifierProvider(create: (_) => AssessmentProvider()),
         ChangeNotifierProvider(create: (_) => GrowthProvider()),
+        ChangeNotifierProvider(create: (_) => CourseProvider()),
       ],
       child: const LittleTreeApp(),
     ),
