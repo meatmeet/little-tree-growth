@@ -43,13 +43,15 @@ class BabyModel {
 
   factory BabyModel.fromJson(Map<String, dynamic> json) {
     return BabyModel(
-      id: json['id'],
-      userId: json['user_id'],
-      name: json['name'],
-      gender: json['gender'],
-      birthDate: DateTime.parse(json['birth_date']),
-      isPremature: json['is_premature'] ?? false,
-      avatarUrl: json['avatar_url'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['user_id'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      gender: (json['gender'] as num?)?.toInt() ?? 1,
+      birthDate: json['birth_date'] != null
+          ? DateTime.parse(json['birth_date'] as String)
+          : DateTime.now(),
+      isPremature: json['is_premature'] == 1 || json['is_premature'] == true,
+      avatarUrl: json['avatar_url'] as String?,
     );
   }
 

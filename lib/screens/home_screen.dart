@@ -25,8 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TaskProvider>().loadTodayTasks();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<TaskProvider>().loadTodayTasks();
+      if (!context.mounted) return;
+      final error = context.read<TaskProvider>().error;
+      if (error != null) {
+        showSnackBar(context, '加载任务失败，已显示缓存数据');
+      }
       final baby = context.read<BabyProvider>().currentBaby;
       if (baby != null) {
         context.read<GrowthProvider>().loadRecords(baby.id);

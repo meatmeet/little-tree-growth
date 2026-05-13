@@ -22,8 +22,13 @@ class _CoursesScreenState extends State<CoursesScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CourseProvider>().loadCourses();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<CourseProvider>().loadCourses();
+      if (!context.mounted) return;
+      final error = context.read<CourseProvider>().error;
+      if (error != null) {
+        showSnackBar(context, '加载课程失败，已显示缓存数据');
+      }
     });
   }
 

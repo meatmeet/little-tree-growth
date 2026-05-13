@@ -67,19 +67,19 @@ class TaskModel {
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
-      id: json['id'],
-      area: json['area'],
-      title: json['title'],
-      description: json['description'],
-      purpose: json['purpose'] ?? '',
-      ageGroupMin: json['age_group_min'],
-      ageGroupMax: json['age_group_max'],
-      difficulty: json['difficulty'] ?? 1,
-      durationMin: json['duration_min'] ?? 10,
-      materialsNeeded: json['materials_needed'],
-      videoUrl: json['video_url'],
-      iconUrl: json['icon_url'],
-      tips: json['tips'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      area: json['area'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      purpose: json['purpose'] as String? ?? '',
+      ageGroupMin: (json['age_group_min'] as num?)?.toInt() ?? 0,
+      ageGroupMax: (json['age_group_max'] as num?)?.toInt() ?? 0,
+      difficulty: (json['difficulty'] as num?)?.toInt() ?? 1,
+      durationMin: (json['duration_min'] as num?)?.toInt() ?? 10,
+      materialsNeeded: json['materials_needed'] as String?,
+      videoUrl: json['video_url'] as String?,
+      iconUrl: json['icon_url'] as String?,
+      tips: json['tips'] as String?,
     );
   }
 }

@@ -55,7 +55,10 @@ class BabyProvider extends ChangeNotifier {
       final res = await _api.post('/babies', body: baby.toJson());
       final created = BabyModel.fromJson(res['data'] as Map<String, dynamic>);
       _babies.add(created);
-      _currentBaby ??= created;
+      if (_currentBaby == null) {
+        _currentBaby = created;
+        _storage.setJson(AppConstants.babyKey, created.toJson());
+      }
       notifyListeners();
       return true;
     } catch (e) {

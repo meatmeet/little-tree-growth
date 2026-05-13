@@ -41,15 +41,17 @@ class AssessmentModel {
 
   factory AssessmentModel.fromJson(Map<String, dynamic> json) {
     return AssessmentModel(
-      id: json['id'],
-      babyId: json['baby_id'],
-      assessmentDate: DateTime.parse(json['assessment_date']),
-      actualAgeMonths: (json['actual_age_months'] as num).toDouble(),
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      babyId: (json['baby_id'] as num?)?.toInt() ?? 0,
+      assessmentDate: json['assessment_date'] != null
+          ? DateTime.parse(json['assessment_date'] as String)
+          : DateTime.now(),
+      actualAgeMonths: (json['actual_age_months'] as num?)?.toDouble() ?? 0,
       overallDq: (json['overall_dq'] as num?)?.toDouble(),
       overallMentalAge: (json['overall_mental_age'] as num?)?.toDouble(),
-      status: json['status'] ?? 'draft',
+      status: json['status'] as String? ?? 'draft',
       areas: (json['areas'] as List<dynamic>?)
-          ?.map((a) => AreaResult.fromJson(a))
+          ?.map((a) => AreaResult.fromJson(a as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -83,11 +85,11 @@ class AreaResult {
 
   factory AreaResult.fromJson(Map<String, dynamic> json) {
     return AreaResult(
-      area: json['area'],
+      area: json['area'] as String? ?? '',
       mentalAge: (json['mental_age'] as num?)?.toDouble(),
       dqScore: (json['dq_score'] as num?)?.toDouble(),
-      itemsPassed: json['items_passed'] ?? 0,
-      itemsTotal: json['items_total'] ?? 0,
+      itemsPassed: (json['items_passed'] as num?)?.toInt() ?? 0,
+      itemsTotal: (json['items_total'] as num?)?.toInt() ?? 0,
     );
   }
 }

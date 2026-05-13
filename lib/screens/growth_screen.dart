@@ -8,6 +8,7 @@ import '../models/growth_record.dart';
 import '../providers/baby_provider.dart';
 import '../providers/growth_provider.dart';
 import '../widgets/measure_card.dart';
+import '../widgets/timeline_item.dart';
 import 'growth_record_form_screen.dart';
 import 'milestone_form_screen.dart';
 
@@ -26,10 +27,15 @@ class _GrowthScreenState extends State<GrowthScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final baby = context.read<BabyProvider>().currentBaby;
       if (baby != null) {
-        context.read<GrowthProvider>().loadRecords(baby.id);
+        await context.read<GrowthProvider>().loadRecords(baby.id);
+        if (!context.mounted) return;
+        final error = context.read<GrowthProvider>().error;
+        if (error != null) {
+          showSnackBar(context, '加载生长记录失败，已显示缓存数据');
+        }
         context.read<GrowthProvider>().loadMilestones(baby.id);
       }
     });
@@ -525,8 +531,8 @@ class _GrowthChartPanel extends StatelessWidget {
     if (points.isEmpty) return _emptyChart();
 
     final values = points.map((p) => p.y).toList();
-    final yMin = (values.reduce((a, b) => a < b ? a : b) - (label == '体重' ? 1 : 3)).clamp(0, 999);
-    final yMax = (values.reduce((a, b) => a > b ? a : b) + (label == '体重' ? 1 : 3)).clamp(1, 999);
+    final yMin = ((values.reduce((a, b) => a < b ? a : b) - (label == '体重' ? 1 : 3)).clamp(0, 999)).toDouble();
+    final yMax = ((values.reduce((a, b) => a > b ? a : b) + (label == '体重' ? 1 : 3)).clamp(1, 999)).toDouble();
     final yRange = yMax - yMin;
 
     return Padding(

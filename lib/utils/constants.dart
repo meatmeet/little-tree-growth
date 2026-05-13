@@ -19,6 +19,7 @@ class AppConstants {
   static const String assessmentKey = 'assessment_cache';
   static const String growthCacheKey = 'growth_data';
   static const String milestoneCacheKey = 'milestone_data';
+  static const String courseCacheKey = 'course_cache';
   static const String settingsKey = 'app_settings';
 
   // Assessment

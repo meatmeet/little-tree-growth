@@ -18,10 +18,15 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final baby = context.read<BabyProvider>().currentBaby;
       if (baby != null) {
-        context.read<AssessmentProvider>().loadAssessments(baby.id);
+        await context.read<AssessmentProvider>().loadAssessments(baby.id);
+        if (!context.mounted) return;
+        final error = context.read<AssessmentProvider>().error;
+        if (error != null) {
+          showSnackBar(context, '加载评测数据失败，已显示缓存数据');
+        }
       }
     });
   }

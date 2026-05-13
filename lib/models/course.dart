@@ -29,15 +29,15 @@ class CourseModel {
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'] ?? '',
-      coverUrl: json['cover_url'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      coverUrl: json['cover_url'] as String?,
       price: (json['price'] as num?)?.toDouble() ?? 0,
-      courseType: json['course_type'] ?? 'free',
-      ageGroupMin: json['age_group_min'],
-      ageGroupMax: json['age_group_max'],
-      totalLessons: json['total_lessons'] ?? 0,
+      courseType: json['course_type'] as String? ?? 'free',
+      ageGroupMin: (json['age_group_min'] as num?)?.toInt(),
+      ageGroupMax: (json['age_group_max'] as num?)?.toInt(),
+      totalLessons: (json['total_lessons'] as num?)?.toInt() ?? 0,
       progress: (json['progress'] as num?)?.toDouble() ?? 0,
       isPublished: json['is_published'] == 1 || json['is_published'] == true,
     );
@@ -65,12 +65,12 @@ class CourseLesson {
 
   factory CourseLesson.fromJson(Map<String, dynamic> json) {
     return CourseLesson(
-      id: json['id'],
-      courseId: json['course_id'],
-      title: json['title'],
-      description: json['description'],
-      videoUrl: json['video_url'],
-      durationMin: json['duration_min'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      courseId: (json['course_id'] as num?)?.toInt() ?? 0,
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String?,
+      videoUrl: json['video_url'] as String?,
+      durationMin: (json['duration_min'] as num?)?.toInt(),
       isFreePreview: json['is_free_preview'] == 1 || json['is_free_preview'] == true,
     );
   }

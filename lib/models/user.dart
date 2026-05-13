@@ -19,14 +19,14 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      phone: json['phone'],
-      email: json['email'],
-      nickname: json['nickname'],
-      avatarUrl: json['avatar_url'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      phone: json['phone'] as String? ?? '',
+      email: json['email'] as String?,
+      nickname: json['nickname'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
       isVip: json['is_vip'] == 1 || json['is_vip'] == true,
       vipExpireAt: json['vip_expire_at'] != null
-          ? DateTime.parse(json['vip_expire_at'])
+          ? DateTime.parse(json['vip_expire_at'] as String)
           : null,
     );
   }

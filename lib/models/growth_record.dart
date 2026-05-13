@@ -29,13 +29,15 @@ class GrowthRecord {
 
   factory GrowthRecord.fromJson(Map<String, dynamic> json) {
     return GrowthRecord(
-      id: json['id'],
-      babyId: json['baby_id'],
-      recordDate: DateTime.parse(json['record_date']),
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      babyId: (json['baby_id'] as num?)?.toInt() ?? 0,
+      recordDate: json['record_date'] != null
+          ? DateTime.parse(json['record_date'] as String)
+          : DateTime.now(),
       heightCm: (json['height_cm'] as num?)?.toDouble(),
       weightKg: (json['weight_kg'] as num?)?.toDouble(),
       headCircCm: (json['head_circ_cm'] as num?)?.toDouble(),
-      notes: json['notes'],
+      notes: json['notes'] as String?,
     );
   }
 }
@@ -94,14 +96,14 @@ class Milestone {
 
   factory Milestone.fromJson(Map<String, dynamic> json) {
     return Milestone(
-      id: json['id'],
-      babyId: json['baby_id'],
-      milestoneType: json['milestone_type'],
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      babyId: (json['baby_id'] as num?)?.toInt() ?? 0,
+      milestoneType: json['milestone_type'] as String? ?? '',
       occurredAt: json['occurred_at'] != null
-          ? DateTime.parse(json['occurred_at'])
+          ? DateTime.parse(json['occurred_at'] as String)
           : null,
-      notes: json['notes'],
-      photoUrl: json['photo_url'],
+      notes: json['notes'] as String?,
+      photoUrl: json['photo_url'] as String?,
     );
   }
 }
