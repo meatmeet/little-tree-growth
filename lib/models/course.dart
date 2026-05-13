@@ -27,6 +27,20 @@ class CourseModel {
 
   bool get isFree => courseType == 'free' || price == 0;
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'description': description,
+    'cover_url': coverUrl,
+    'price': price,
+    'course_type': courseType,
+    'age_group_min': ageGroupMin,
+    'age_group_max': ageGroupMax,
+    'total_lessons': totalLessons,
+    'progress': progress,
+    'is_published': isPublished,
+  };
+
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
