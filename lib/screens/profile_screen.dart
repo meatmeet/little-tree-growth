@@ -34,7 +34,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: ListView(
+      body: RefreshIndicator(
+        onRefresh: () => context.read<BabyProvider>().loadBabies(),
+        child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           // User Profile Header
@@ -191,6 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           const SizedBox(height: 32),
         ],
+      ),
       ),
     );
   }
