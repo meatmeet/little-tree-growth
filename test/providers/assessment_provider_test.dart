@@ -16,6 +16,20 @@ void main() {
       expect(provider.error, isNull);
     });
 
+    test('initial report state is correct', () {
+      expect(provider.highlights, isEmpty);
+      expect(provider.suggestions, isEmpty);
+      expect(provider.reportLoading, false);
+      expect(provider.reportError, isNull);
+    });
+
+    test('initial radar state is correct', () {
+      expect(provider.radarLabels, isEmpty);
+      expect(provider.radarValues, isEmpty);
+      expect(provider.radarLoading, false);
+      expect(provider.radarError, isNull);
+    });
+
     test('selectAssessment sets current assessment', () {
       expect(provider.currentAssessment, isNull);
     });
@@ -23,6 +37,14 @@ void main() {
     test('clearError resets error', () {
       provider.clearError();
       expect(provider.error, isNull);
+    });
+
+    test('items getter returns default empty list', () {
+      expect(provider.items, isEmpty);
+    });
+
+    test('trend getter returns default empty list', () {
+      expect(provider.trend, isEmpty);
     });
   });
 }
