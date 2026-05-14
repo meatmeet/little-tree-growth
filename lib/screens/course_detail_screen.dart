@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../services/api_service.dart';
 import '../models/course.dart';
+import '../providers/course_provider.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final int? courseId;
@@ -28,6 +31,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   final ApiService _api = ApiService();
   List<CourseLesson> _lessons = [];
   bool _loading = true;
+  bool _isPurchased = false;
 
   @override
   void initState() {
@@ -49,17 +53,38 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             [];
         setState(() => _lessons = list);
       }
-    } catch (_) {
-      // Fallback to static
-    } finally {
-      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      debugPrint('CourseDetailScreen._loadLessons error: $e');
+    }
+    if (mounted) {
+      final cp = context.read<CourseProvider>();
+      final course = cp.courses.where((c) => c.id == widget.courseId).firstOrNull;
+      setState(() {
+        _loading = false;
+        _isPurchased = course?.courseType == 'purchased' || course?.isFree == true;
+      });
+    }
+  }
+
+  Future<void> _purchase() async {
+    final cp = context.read<CourseProvider>();
+    final ok = await cp.purchaseCourse(widget.courseId!);
+    if (mounted) {
+      if (ok) {
+        setState(() => _isPurchased = true);
+        showSnackBar(context, '购买成功！');
+      } else {
+        showSnackBar(context, cp.error ?? '购买失败，请重试');
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final accentColor = widget.color ?? AppTheme.primary;
-    final displayLessons = _loading ? _buildSkeletonLessons() : (_lessons.isNotEmpty ? _lessons : _buildStaticLessons());
+    final displayLessons = _loading
+        ? _buildSkeletonLessons()
+        : (_lessons.isNotEmpty ? _lessons : _buildStaticLessons());
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
@@ -77,24 +102,42 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             child: Column(
               children: [
                 Container(
-                  width: 64, height: 64,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Center(child: Icon(Icons.auto_stories, size: 32, color: AppTheme.primary)),
+                  child: const Center(
+                      child:
+                          Icon(Icons.auto_stories, size: 32, color: AppTheme.primary)),
                 ),
                 const SizedBox(height: 12),
-                Text(widget.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
+                Text(widget.title,
+                    style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.textPrimary)),
                 const SizedBox(height: 6),
-                Text(widget.subtitle, style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary, height: 1.4),
-                  textAlign: TextAlign.center),
+                Text(widget.subtitle,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.textSecondary,
+                        height: 1.4),
+                    textAlign: TextAlign.center),
                 if (widget.ageRange != null) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                    child: Text('适合 ${widget.ageRange}', style: TextStyle(fontSize: 12, color: accentColor, fontWeight: FontWeight.w600)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                        color: accentColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Text('适合 ${widget.ageRange}',
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: accentColor,
+                            fontWeight: FontWeight.w600)),
                   ),
                 ],
               ],
@@ -103,23 +146,61 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
           const SizedBox(height: 24),
 
-          const Text('课程简介', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+          const Text('课程简介',
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary)),
           const SizedBox(height: 8),
           const Text(
             '本课程通过科学设计的游戏活动，促进宝宝在对应能区的发展。建议家长每天安排15-30分钟，在轻松愉快的氛围中与宝宝互动。',
-            style: TextStyle(fontSize: 14, color: AppTheme.textSecondary, height: 1.6),
+            style: TextStyle(
+                fontSize: 14, color: AppTheme.textSecondary, height: 1.6),
           ),
 
           const SizedBox(height: 20),
 
-          Text(
-            '课程内容 (${displayLessons.length}节)',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+          // Lessons header with purchase button
+          Row(
+            children: [
+              Text(
+                '课程内容 (${displayLessons.length}节)',
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary),
+              ),
+              const Spacer(),
+              if (widget.courseId != null && !_isPurchased)
+                GestureDetector(
+                  onTap: _purchase,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.warm,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Text(
+                      '¥29 购买课程',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
+
           const SizedBox(height: 10),
+
+          // Lesson list
           ...displayLessons.asMap().entries.map((entry) {
             final i = entry.key;
             final lesson = entry.value;
+            final isUnlocked = _isPurchased || lesson.isFreePreview;
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Container(
@@ -132,27 +213,54 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                 child: Row(
                   children: [
                     Container(
-                      width: 36, height: 36,
-                      decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                      child: Center(child: Text('${i + 1}', style: TextStyle(fontWeight: FontWeight.w700, color: accentColor))),
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: accentColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                          child: Text('${i + 1}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: accentColor))),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(lesson.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-                          if (lesson.description != null && lesson.description!.isNotEmpty) ...[
+                          Text(lesson.title,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textPrimary)),
+                          if (lesson.description != null &&
+                              lesson.description!.isNotEmpty) ...[
                             const SizedBox(height: 2),
-                            Text(lesson.description!, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                            Text(lesson.description!,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.textSecondary)),
                           ],
                         ],
                       ),
                     ),
                     if (lesson.durationMin != null)
-                      Text('${lesson.durationMin}min', style: const TextStyle(fontSize: 11, color: AppTheme.textTertiary)),
+                      Text('${lesson.durationMin}min',
+                          style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textTertiary)),
                     const SizedBox(width: 8),
-                    const Icon(Icons.lock_outline, size: 18, color: AppTheme.textTertiary),
+                    Icon(
+                      isUnlocked
+                          ? Icons.play_circle_outline
+                          : Icons.lock_outline,
+                      size: 18,
+                      color: isUnlocked
+                          ? AppTheme.primary
+                          : AppTheme.textTertiary,
+                    ),
                   ],
                 ),
               ),
@@ -165,16 +273,35 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
   List<CourseLesson> _buildStaticLessons() {
     return [
-      CourseLesson(id: 1, courseId: widget.courseId ?? 0, title: '基础认知训练', description: '认知能力的基础训练', durationMin: 10),
-      CourseLesson(id: 2, courseId: widget.courseId ?? 0, title: '感官发展游戏', description: '多感官综合刺激', durationMin: 10),
-      CourseLesson(id: 3, courseId: widget.courseId ?? 0, title: '亲子互动练习', description: '增进亲子关系的活动', durationMin: 15),
-      CourseLesson(id: 4, courseId: widget.courseId ?? 0, title: '综合能力提升', description: '综合能力训练', durationMin: 15),
+      CourseLesson(
+          id: 1,
+          courseId: widget.courseId ?? 0,
+          title: '基础认知训练',
+          description: '认知能力的基础训练',
+          durationMin: 10),
+      CourseLesson(
+          id: 2,
+          courseId: widget.courseId ?? 0,
+          title: '感官发展游戏',
+          description: '多感官综合刺激',
+          durationMin: 10),
+      CourseLesson(
+          id: 3,
+          courseId: widget.courseId ?? 0,
+          title: '亲子互动练习',
+          description: '增进亲子关系的活动',
+          durationMin: 15),
+      CourseLesson(
+          id: 4,
+          courseId: widget.courseId ?? 0,
+          title: '综合能力提升',
+          description: '综合能力训练',
+          durationMin: 15),
     ];
   }
 
   List<CourseLesson> _buildSkeletonLessons() {
     return List.generate(4, (i) => CourseLesson(
-      id: i, courseId: widget.courseId ?? 0, title: '加载中...', durationMin: 0,
-    ));
+        id: i, courseId: widget.courseId ?? 0, title: '加载中...', durationMin: 0));
   }
 }

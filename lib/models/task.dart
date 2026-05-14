@@ -14,9 +14,9 @@ class TaskModel {
   final String? tips;
 
   // Runtime state
-  bool isCompleted;
-  DateTime? completedAt;
-  int? userRating;
+  final bool isCompleted;
+  final DateTime? completedAt;
+  final int? userRating;
 
   TaskModel({
     required this.id,
@@ -36,6 +36,44 @@ class TaskModel {
     this.completedAt,
     this.userRating,
   });
+
+  TaskModel copyWith({
+    int? id,
+    String? area,
+    String? title,
+    String? description,
+    String? purpose,
+    int? ageGroupMin,
+    int? ageGroupMax,
+    int? difficulty,
+    int? durationMin,
+    String? materialsNeeded,
+    String? videoUrl,
+    String? iconUrl,
+    String? tips,
+    bool? isCompleted,
+    DateTime? completedAt,
+    int? userRating,
+  }) {
+    return TaskModel(
+      id: id ?? this.id,
+      area: area ?? this.area,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      purpose: purpose ?? this.purpose,
+      ageGroupMin: ageGroupMin ?? this.ageGroupMin,
+      ageGroupMax: ageGroupMax ?? this.ageGroupMax,
+      difficulty: difficulty ?? this.difficulty,
+      durationMin: durationMin ?? this.durationMin,
+      materialsNeeded: materialsNeeded ?? this.materialsNeeded,
+      videoUrl: videoUrl ?? this.videoUrl,
+      iconUrl: iconUrl ?? this.iconUrl,
+      tips: tips ?? this.tips,
+      isCompleted: isCompleted ?? this.isCompleted,
+      completedAt: completedAt ?? this.completedAt,
+      userRating: userRating ?? this.userRating,
+    );
+  }
 
   String get difficultyLabel {
     switch (difficulty) {

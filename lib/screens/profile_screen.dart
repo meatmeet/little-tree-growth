@@ -8,6 +8,14 @@ import '../models/baby.dart';
 import '../widgets/vip_card.dart';
 import 'login_screen.dart';
 import 'baby_form_screen.dart';
+import 'vip_purchase_screen.dart';
+import 'profile_edit_screen.dart';
+import 'notification_settings_screen.dart';
+import 'data_sync_screen.dart';
+import 'privacy_settings_screen.dart';
+import 'about_screen.dart';
+import 'settings_screen.dart';
+import 'stats_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +25,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BabyProvider>().loadBabies();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final babyProvider = context.watch<BabyProvider>();
@@ -30,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, size: 22),
-            onPressed: () => showSnackBar(context, '设置功能开发中'),
+            onPressed: () => pushScreen(context, const SettingsScreen()),
           ),
         ],
       ),
@@ -42,7 +58,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // User Profile Header
           GestureDetector(
             onTap: () {
-              if (!authProvider.isLoggedIn) {
+              if (authProvider.isLoggedIn) {
+                pushScreen(context, const ProfileEditScreen());
+              } else {
                 pushScreen(context, const LoginScreen());
               }
             },
@@ -105,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           VipCard(
             isVip: authProvider.isVip,
             expireAt: user?.vipExpireAt,
-            onActivate: () => showSnackBar(context, '会员功能开发中'),
+            onActivate: () => pushScreen(context, const VipPurchaseScreen()),
           ),
 
           const SizedBox(height: 20),
@@ -162,6 +180,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           const SizedBox(height: 24),
 
+          // Stats Entry
+          GestureDetector(
+            onTap: () => pushScreen(context, const StatsScreen()),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBg,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppTheme.primaryPale),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.analytics_outlined, size: 22, color: AppTheme.primary),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '成长统计',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, color: AppTheme.textTertiary),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Settings Menu
           const Text(
             '设置',
@@ -173,10 +223,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 10),
 
-          _settingItem(Icons.notifications_outlined, '消息通知', () => showSnackBar(context, '开发中')),
-          _settingItem(Icons.cloud_sync_outlined, '数据同步', () => showSnackBar(context, '开发中')),
-          _settingItem(Icons.shield_outlined, '隐私设置', () => showSnackBar(context, '开发中')),
-          _settingItem(Icons.info_outline, '关于我们', () => showSnackBar(context, '小树成长 v1.0.0')),
+          _settingItem(Icons.notifications_outlined, '消息通知', () => pushScreen(context, const NotificationSettingsScreen())),
+          _settingItem(Icons.cloud_sync_outlined, '数据同步', () => pushScreen(context, const DataSyncScreen())),
+          _settingItem(Icons.shield_outlined, '隐私设置', () => pushScreen(context, const PrivacySettingsScreen())),
+          _settingItem(Icons.info_outline, '关于我们', () => pushScreen(context, const AboutScreen())),
+
+          // Logout
+          if (authProvider.isLoggedIn) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('退出登录'),
+                      content: const Text('确定要退出登录吗？退出后需要重新登录。'),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(false),
+                            child: const Text('取消')),
+                        TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(true),
+                            child: const Text('确定',
+                                style: TextStyle(color: AppTheme.danger)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && context.mounted) {
+                    await context.read<AuthProvider>().logout();
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.danger,
+                  side: const BorderSide(color: AppTheme.danger),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('退出登录',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
 
           const SizedBox(height: 32),
 
@@ -300,26 +390,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: AppTheme.bgMuted,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Column(
-        children: [
-          Text('👶', style: TextStyle(fontSize: 28)),
-          SizedBox(height: 6),
-          Text(
-            '还没有添加宝宝',
-            style: TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: 14,
+      child: Consumer<BabyProvider>(
+        builder: (context, bp, _) => Column(
+          children: [
+            if (bp.loading)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: 24, height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            const Text('👶', style: TextStyle(fontSize: 28)),
+            const SizedBox(height: 6),
+            const Text(
+              '还没有添加宝宝',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 14,
+              ),
             ),
-          ),
-          SizedBox(height: 2),
-          Text(
-            '添加宝宝信息开始记录成长',
-            style: TextStyle(
-              color: AppTheme.textTertiary,
-              fontSize: 12,
+            const SizedBox(height: 2),
+            const Text(
+              '添加宝宝信息开始记录成长',
+              style: TextStyle(
+                color: AppTheme.textTertiary,
+                fontSize: 12,
+              ),
             ),
-          ),
-        ],
+            if (bp.error != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                bp.error!,
+                style: const TextStyle(
+                  color: AppTheme.danger,
+                  fontSize: 11,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () => bp.loadBabies(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBg,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '重新加载',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            // Debug info when list is empty but load has completed
+            if (!bp.loading && bp.hasLoaded && bp.babies.isEmpty && bp.error == null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  '没有查到宝宝数据（已加载完成）',
+                  style: const TextStyle(
+                    color: AppTheme.textTertiary,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

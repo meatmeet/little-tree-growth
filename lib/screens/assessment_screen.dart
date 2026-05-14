@@ -5,6 +5,7 @@ import '../utils/navigation.dart';
 import '../models/assessment.dart';
 import '../providers/baby_provider.dart';
 import '../providers/assessment_provider.dart';
+import 'assessment_quiz_screen.dart';
 import 'assessment_detail_screen.dart';
 
 class AssessmentScreen extends StatefulWidget {
@@ -304,7 +305,13 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     final provider = context.read<AssessmentProvider>();
     provider.createAssessment(baby.id, baby.ageInMonths.toDouble()).then((a) {
       if (a != null && context.mounted) {
-        pushScreen(context, AssessmentDetailScreen(assessment: a));
+        pushScreen(
+          context,
+          AssessmentQuizScreen(
+            assessmentId: a.id,
+            ageGroup: _getStandardAgeGroup(baby.ageInMonths),
+          ),
+        );
       }
     });
   }

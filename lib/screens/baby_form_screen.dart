@@ -6,7 +6,7 @@ import '../models/baby.dart';
 import '../providers/baby_provider.dart';
 
 class BabyFormScreen extends StatefulWidget {
-  final BabyModel? baby; // null = add mode, non-null = edit mode
+  final BabyModel? baby;
 
   const BabyFormScreen({super.key, this.baby});
 
@@ -18,10 +18,13 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
   late final TextEditingController _nameController;
   late bool _isEdit;
 
-  int _gender = 1; // 1=男, 0=女
+  int _gender = 1;
   DateTime _birthDate = DateTime.now().subtract(const Duration(days: 365));
   bool _isPremature = false;
+  String _avatar = '';
   bool _saving = false;
+
+  static const _avatars = ['👶', '👦', '👧', '🧒', '🌟', '🌸', '🦋', '🌈', '🐰', '🐱', '🐶', '🦁'];
 
   @override
   void initState() {
@@ -32,6 +35,7 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
       _gender = widget.baby!.gender;
       _birthDate = widget.baby!.birthDate;
       _isPremature = widget.baby!.isPremature;
+      _avatar = widget.baby!.avatarUrl ?? '';
     }
   }
 
@@ -76,7 +80,7 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
         gender: _gender,
         birthDate: _birthDate,
         isPremature: _isPremature,
-        avatarUrl: widget.baby!.avatarUrl,
+        avatarUrl: _avatar.isNotEmpty ? _avatar : widget.baby!.avatarUrl,
       );
       ok = await babyProvider.updateBaby(updated);
     } else {
@@ -87,6 +91,7 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
         gender: _gender,
         birthDate: _birthDate,
         isPremature: _isPremature,
+        avatarUrl: _avatar.isNotEmpty ? _avatar : null,
       );
       ok = await babyProvider.addBaby(newBaby);
     }
@@ -107,7 +112,6 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEdit ? '编辑宝宝' : '添加宝宝'),
@@ -115,8 +119,53 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Avatar Selector
+          const Text('头像',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary)),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 60,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: _avatars.map((a) {
+                final selected = _avatar == a;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _avatar = a),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: selected ? AppTheme.primaryBg : AppTheme.bgMuted,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: selected ? AppTheme.primary : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(a, style: const TextStyle(fontSize: 28)),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
           // Name
-          const Text('姓名', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const Text('姓名',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary)),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
@@ -137,7 +186,11 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
           const SizedBox(height: 20),
 
           // Gender
-          const Text('性别', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const Text('性别',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -154,7 +207,9 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
                       ),
                     ),
                     child: const Center(
-                      child: Text('👦 男宝', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      child: Text('👦 男宝',
+                          style:
+                              TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -173,7 +228,9 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
                       ),
                     ),
                     child: const Center(
-                      child: Text('👧 女宝', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      child: Text('👧 女宝',
+                          style:
+                              TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ),
@@ -184,7 +241,11 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
           const SizedBox(height: 20),
 
           // Birth Date
-          const Text('出生日期', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const Text('出生日期',
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary)),
           const SizedBox(height: 8),
           GestureDetector(
             onTap: _pickDate,
@@ -196,14 +257,17 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today, size: 18, color: AppTheme.textSecondary),
+                  const Icon(Icons.calendar_today,
+                      size: 18, color: AppTheme.textSecondary),
                   const SizedBox(width: 10),
                   Text(
                     '${_birthDate.year}-${_birthDate.month.toString().padLeft(2, '0')}-${_birthDate.day.toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 16, color: AppTheme.textPrimary),
+                    style:
+                        const TextStyle(fontSize: 16, color: AppTheme.textPrimary),
                   ),
                   const Spacer(),
-                  const Icon(Icons.chevron_right, size: 18, color: AppTheme.textTertiary),
+                  const Icon(Icons.chevron_right,
+                      size: 18, color: AppTheme.textTertiary),
                 ],
               ),
             ),
@@ -214,7 +278,11 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
           // Premature
           Row(
             children: [
-              const Text('是否早产', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+              const Text('是否早产',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary)),
               const Spacer(),
               Switch(
                 value: _isPremature,
@@ -233,8 +301,10 @@ class _BabyFormScreenState extends State<BabyFormScreen> {
               onPressed: _saving ? null : _save,
               child: _saving
                   ? const SizedBox(
-                      width: 20, height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
                     )
                   : Text(_isEdit ? '保存' : '添加宝宝'),
             ),

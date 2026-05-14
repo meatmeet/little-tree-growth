@@ -39,6 +39,11 @@ class AuthService {
     return _currentUser!;
   }
 
+  Future<Map<String, dynamic>> getVipStatus() async {
+    final res = await _api.get('/subscriptions/current');
+    return (res['data'] as Map<String, dynamic>?) ?? {};
+  }
+
   Future<UserModel> sendCode(String phone) async {
     final res = await _api.post('/auth/send-code', body: {
       'phone': phone,

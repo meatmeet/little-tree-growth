@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
+import '../screens/checkin_calendar_screen.dart';
 
 class StreakCard extends StatelessWidget {
   final int streakDays;
@@ -15,7 +17,9 @@ class StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => pushScreen(context, const CheckinCalendarScreen()),
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -110,6 +114,7 @@ class StreakCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }

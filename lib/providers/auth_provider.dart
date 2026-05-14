@@ -55,6 +55,28 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refreshVipStatus() async {
+    try {
+      final data = await _authService.getVipStatus();
+      if (_user != null && data['has_subscription'] == true) {
+        final updated = UserModel(
+          id: _user!.id,
+          phone: _user!.phone,
+          nickname: _user!.nickname,
+          avatarUrl: _user!.avatarUrl,
+          isVip: true,
+          vipExpireAt: data['end_date'] != null
+              ? DateTime.tryParse(data['end_date'] as String)
+              : null,
+        );
+        _user = updated;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('refreshVipStatus error: $e');
+    }
+  }
+
   Future<bool> updateProfile(Map<String, dynamic> data) async {
     try {
       _user = await _authService.updateProfile(data);

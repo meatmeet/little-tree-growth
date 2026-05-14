@@ -13,6 +13,7 @@ import 'milestone_form_screen.dart';
 import 'assessment_screen.dart';
 import 'growth_screen.dart';
 import 'task_detail_screen.dart';
+import 'notification_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -55,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined, size: 22),
-            onPressed: () => showSnackBar(context, '通知功能开发中'),
+            onPressed: () => pushScreen(context, const NotificationListScreen()),
           ),
         ],
       ),

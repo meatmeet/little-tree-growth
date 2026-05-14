@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../utils/theme.dart';
 
 class TimelineItem extends StatelessWidget {
@@ -9,6 +10,7 @@ class TimelineItem extends StatelessWidget {
   final bool isLast;
   final Color? color;
   final VoidCallback? onTap;
+  final String? photoUrl;
 
   const TimelineItem({
     super.key,
@@ -19,6 +21,7 @@ class TimelineItem extends StatelessWidget {
     this.isLast = false,
     this.color,
     this.onTap,
+    this.photoUrl,
   });
 
   @override
@@ -69,6 +72,31 @@ class TimelineItem extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppTheme.textTertiary,
+                        ),
+                      ),
+                    ),
+                  if (photoUrl != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: photoUrl!,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(
+                            width: 60,
+                            height: 60,
+                            color: AppTheme.bgMuted,
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            width: 60,
+                            height: 60,
+                            color: AppTheme.bgMuted,
+                            child: const Icon(Icons.broken_image_outlined,
+                                size: 24, color: AppTheme.textTertiary),
+                          ),
                         ),
                       ),
                     ),

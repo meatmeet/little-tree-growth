@@ -7,6 +7,7 @@ import '../utils/navigation.dart';
 import '../models/growth_record.dart';
 import '../providers/baby_provider.dart';
 import '../providers/growth_provider.dart';
+import '../providers/assessment_provider.dart';
 import '../widgets/measure_card.dart';
 import '../widgets/timeline_item.dart';
 import 'growth_record_form_screen.dart';
@@ -37,6 +38,8 @@ class _GrowthScreenState extends State<GrowthScreen>
           showSnackBar(context, '加载生长记录失败，已显示缓存数据');
         }
         context.read<GrowthProvider>().loadMilestones(baby.id);
+        context.read<GrowthProvider>().loadGrowthStandards(baby.id);
+        context.read<AssessmentProvider>().loadRadarData({'baby_id': '${baby.id}'});
       }
     });
   }
@@ -49,7 +52,6 @@ class _GrowthScreenState extends State<GrowthScreen>
 
   @override
   Widget build(BuildContext context) {
-    final baby = context.watch<BabyProvider>().currentBaby;
     return Scaffold(
       appBar: AppBar(
         title: const Text('成长记录'),
@@ -68,9 +70,9 @@ class _GrowthScreenState extends State<GrowthScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _RecordsTab(baby: baby),
-          _MilestonesTab(baby: baby),
-          _ChartsTab(baby: baby),
+          const _RecordsTab(),
+          const _MilestonesTab(),
+          const _ChartsTab(),
         ],
       ),
     );
@@ -79,8 +81,7 @@ class _GrowthScreenState extends State<GrowthScreen>
 
 // --- Records Tab ---
 class _RecordsTab extends StatelessWidget {
-  final dynamic baby;
-  const _RecordsTab({this.baby});
+  const _RecordsTab();
 
   @override
   Widget build(BuildContext context) {
@@ -262,8 +263,7 @@ class _RecordsTab extends StatelessWidget {
 
 // --- Milestones Tab ---
 class _MilestonesTab extends StatelessWidget {
-  final dynamic baby;
-  const _MilestonesTab({this.baby});
+  const _MilestonesTab();
 
   @override
   Widget build(BuildContext context) {
@@ -332,6 +332,7 @@ class _MilestonesTab extends StatelessWidget {
                   : null,
               isLast: i == milestones.length - 1,
               color: AppTheme.primary,
+              photoUrl: m.photoUrl,
             );
           }),
         ],
@@ -373,8 +374,7 @@ class _MilestonesTab extends StatelessWidget {
 
 // --- Charts Tab ---
 class _ChartsTab extends StatelessWidget {
-  final dynamic baby;
-  const _ChartsTab({this.baby});
+  const _ChartsTab();
 
   @override
   Widget build(BuildContext context) {
@@ -387,7 +387,11 @@ class _ChartsTab extends StatelessWidget {
     final hasWeight = sorted.any((r) => r.weightKg != null);
     final hasHead = sorted.any((r) => r.headCircCm != null);
 
-    final areas = ['gross_motor', 'fine_motor', 'language', 'adaptation', 'social'];
+    // WHO standard reference data
+    final standards = growth.growthStandards;
+    final heightCurves = standards?['height'] as List<dynamic>?;
+    final weightCurves = standards?['weight'] as List<dynamic>?;
+    final headCurves = standards?['head_circ'] as List<dynamic>?;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -399,6 +403,7 @@ class _ChartsTab extends StatelessWidget {
           label: '身高', unit: 'cm', color: AppTheme.primary,
           records: sorted, hasData: hasHeight,
           extractY: (r) => r.heightCm,
+          standardCurves: heightCurves,
         ),
 
         const SizedBox(height: 12),
@@ -407,6 +412,7 @@ class _ChartsTab extends StatelessWidget {
           label: '体重', unit: 'kg', color: AppTheme.warm,
           records: sorted, hasData: hasWeight,
           extractY: (r) => r.weightKg,
+          standardCurves: weightCurves,
         ),
 
         const SizedBox(height: 12),
@@ -415,54 +421,141 @@ class _ChartsTab extends StatelessWidget {
           label: '头围', unit: 'cm', color: AppTheme.info,
           records: sorted, hasData: hasHead,
           extractY: (r) => r.headCircCm,
+          standardCurves: headCurves,
         ),
 
         const SizedBox(height: 24),
 
-        // Developmental Area Radar (placeholder — real data comes from assessments)
+        // Developmental Area Radar
         const Text('发育评估概览', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
         const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppTheme.bgCard,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: AppTheme.shadowSm,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('五大能区', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
-              const SizedBox(height: 12),
-              ...areas.map((area) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  children: [
-                    Text(AppTheme.getAreaIcon(area), style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 8),
-                    SizedBox(width: 60, child: Text(AppTheme.getAreaName(area), style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary))),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: 0, backgroundColor: AppTheme.bgMuted,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.getAreaColor(area)),
-                          minHeight: 6,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('--', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textTertiary)),
-                  ],
-                ),
-              )),
-            ],
-          ),
-        ),
+        const _RadarSection(),
 
         const SizedBox(height: 24),
       ],
+    );
+  }
+}
+
+// ---- Radar section widget ----
+class _RadarSection extends StatelessWidget {
+  const _RadarSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final ap = context.watch<AssessmentProvider>();
+
+    if (ap.radarLoading) {
+      return Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.bgCard,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: AppTheme.shadowSm,
+        ),
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    if (ap.radarError != null) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppTheme.danger.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline, size: 28, color: AppTheme.danger),
+            const SizedBox(height: 8),
+            const Text('加载失败',
+                style: TextStyle(fontSize: 14, color: AppTheme.danger)),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () {
+                final baby = context.read<BabyProvider>().currentBaby;
+                if (baby != null) {
+                  context.read<AssessmentProvider>().loadRadarData({'baby_id': '${baby.id}'});
+                }
+              },
+              icon: const Icon(Icons.refresh, size: 16),
+              label: const Text('重试'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (ap.radarLabels.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppTheme.bgMuted,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: const Column(
+          children: [
+            Text('📊', style: TextStyle(fontSize: 28)),
+            SizedBox(height: 8),
+            Text('暂无评估数据',
+                style: TextStyle(fontSize: 14, color: AppTheme.textSecondary)),
+            SizedBox(height: 4),
+            Text('完成评测后可查看五大能区评分',
+                style: TextStyle(fontSize: 12, color: AppTheme.textTertiary)),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.bgCard,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: AppTheme.shadowSm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('五大能区',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const SizedBox(height: 12),
+          ...List.generate(ap.radarLabels.length, (i) {
+            final label = ap.radarLabels[i];
+            final value = i < ap.radarValues.length ? ap.radarValues[i] : 0.0;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Text(AppTheme.getAreaIcon(label), style: const TextStyle(fontSize: 16)),
+                  const SizedBox(width: 8),
+                  SizedBox(width: 60, child: Text(
+                    AppTheme.getAreaName(label),
+                    style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                  )),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: (value / 150.0).clamp(0.0, 1.0),
+                        backgroundColor: AppTheme.bgMuted,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.getAreaColor(label)),
+                        minHeight: 6,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    value.toStringAsFixed(0),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.getAreaColor(label)),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }
@@ -475,6 +568,7 @@ class _GrowthChartPanel extends StatelessWidget {
   final List<GrowthRecord> records;
   final bool hasData;
   final double? Function(GrowthRecord) extractY;
+  final List<dynamic>? standardCurves;
 
   const _GrowthChartPanel({
     required this.label,
@@ -483,6 +577,7 @@ class _GrowthChartPanel extends StatelessWidget {
     required this.records,
     required this.hasData,
     required this.extractY,
+    this.standardCurves,
   });
 
   @override
@@ -535,6 +630,33 @@ class _GrowthChartPanel extends StatelessWidget {
     final yMax = ((values.reduce((a, b) => a > b ? a : b) + (label == '体重' ? 1 : 3)).clamp(1, 999)).toDouble();
     final yRange = yMax - yMin;
 
+    // WHO standard reference lines
+    final standardLineBars = <LineChartBarData>[];
+    if (standardCurves != null) {
+      for (final percentile in ['p3', 'p50', 'p97']) {
+        final stdSpots = <FlSpot>[];
+        for (int i = 0; i < standardCurves!.length && i < records.length; i++) {
+          final entry = standardCurves![i] as Map<String, dynamic>?;
+          final val = (entry?[percentile] as num?)?.toDouble();
+          if (val != null) {
+            stdSpots.add(FlSpot(i.toDouble(), val));
+          }
+        }
+        if (stdSpots.length >= 2) {
+          standardLineBars.add(LineChartBarData(
+            spots: stdSpots,
+            isCurved: true,
+            curveSmoothness: 0.3,
+            color: Colors.grey.withValues(alpha: percentile == 'p50' ? 0.5 : 0.25),
+            barWidth: percentile == 'p50' ? 1.5 : 1.0,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(show: false),
+            dashArray: percentile == 'p50' ? null : [4, 4],
+          ));
+        }
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.only(right: 8, top: 8),
       child: LineChart(
@@ -579,6 +701,7 @@ class _GrowthChartPanel extends StatelessWidget {
           ),
           borderData: FlBorderData(show: false),
           lineBarsData: [
+            ...standardLineBars,
             LineChartBarData(
               spots: points,
               isCurved: true, curveSmoothness: 0.3, color: color,

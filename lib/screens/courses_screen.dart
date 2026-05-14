@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
 import '../utils/navigation.dart';
-import '../models/course.dart';
 import '../providers/baby_provider.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_item.dart';

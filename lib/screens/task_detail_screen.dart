@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../utils/navigation.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 
-class TaskDetailScreen extends StatelessWidget {
+class TaskDetailScreen extends StatefulWidget {
   final TaskModel task;
 
   const TaskDetailScreen({super.key, required this.task});
 
   @override
+  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
+}
+
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  int _rating = 0;
+
+  bool get _showRating => widget.task.isCompleted;
+
+  @override
   Widget build(BuildContext context) {
-    final areaColor = AppTheme.getAreaColor(task.area);
+    final areaColor = AppTheme.getAreaColor(widget.task.area);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,7 +53,7 @@ class TaskDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      AppTheme.getAreaName(task.area),
+                      AppTheme.getAreaName(widget.task.area),
                       style: TextStyle(
                         fontSize: 13,
                         color: areaColor,
@@ -52,13 +62,14 @@ class TaskDetailScreen extends StatelessWidget {
                     ),
                     const Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AppTheme.warmBg,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        task.difficultyLabel,
+                        widget.task.difficultyLabel,
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppTheme.warm,
@@ -70,22 +81,25 @@ class TaskDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  task.title,
+                  widget.task.title,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.textPrimary,
                   ),
                 ),
-                if (task.durationMin > 0) ...[
+                if (widget.task.durationMin > 0) ...[
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.timer_outlined, size: 16, color: AppTheme.textSecondary),
+                      const Icon(Icons.timer_outlined,
+                          size: 16, color: AppTheme.textSecondary),
                       const SizedBox(width: 4),
                       Text(
-                        '${task.durationMin}分钟',
-                        style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                        '${widget.task.durationMin}分钟',
+                        style: const TextStyle(
+                            fontSize: 13,
+                            color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
@@ -99,53 +113,75 @@ class TaskDetailScreen extends StatelessWidget {
           // Description
           const Text(
             '活动内容',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 8),
           Text(
-            task.description,
-            style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary, height: 1.6),
+            widget.task.description,
+            style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textSecondary,
+                height: 1.6),
           ),
 
-          if (task.purpose.isNotEmpty) ...[
+          if (widget.task.purpose.isNotEmpty) ...[
             const SizedBox(height: 20),
             const Text(
               '活动目的',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
-              task.purpose,
-              style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary, height: 1.6),
+              widget.task.purpose,
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                  height: 1.6),
             ),
           ],
 
-          if (task.materialsNeeded != null && task.materialsNeeded!.isNotEmpty) ...[
+          if (widget.task.materialsNeeded != null &&
+              widget.task.materialsNeeded!.isNotEmpty) ...[
             const SizedBox(height: 20),
             const Text(
               '所需材料',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
-              task.materialsNeeded!,
-              style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary, height: 1.6),
+              widget.task.materialsNeeded!,
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                  height: 1.6),
             ),
           ],
 
-          if (task.tips != null && task.tips!.isNotEmpty) ...[
+          if (widget.task.tips != null &&
+              widget.task.tips!.isNotEmpty) ...[
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: AppTheme.info.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.info.withValues(alpha: 0.15)),
+                border: Border.all(
+                    color: AppTheme.info.withValues(alpha: 0.15)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.lightbulb_outline, size: 18, color: AppTheme.info),
+                  const Icon(Icons.lightbulb_outline,
+                      size: 18, color: AppTheme.info),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -153,12 +189,18 @@ class TaskDetailScreen extends StatelessWidget {
                       children: [
                         const Text(
                           '小贴士',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.info),
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.info),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          task.tips!,
-                          style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.5),
+                          widget.task.tips!,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.textSecondary,
+                              height: 1.5),
                         ),
                       ],
                     ),
@@ -170,18 +212,80 @@ class TaskDetailScreen extends StatelessWidget {
 
           const SizedBox(height: 32),
 
+          // Rating section (shown after completion)
+          if (_showRating) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.warmBg,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    '给这个任务打个分吧',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (i) {
+                      final star = i + 1;
+                      return IconButton(
+                        icon: Icon(
+                          star <= _rating
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: star <= _rating
+                              ? AppTheme.warm
+                              : AppTheme.textTertiary,
+                          size: 32,
+                        ),
+                        onPressed: () async {
+                          setState(() => _rating = star);
+                          final ok = await context
+                              .read<TaskProvider>()
+                              .rateTask(widget.task.id, star);
+                          if (mounted) {
+                            showSnackBar(
+                                context, ok ? '评分已提交' : '评分提交失败');
+                          }
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Complete toggle
           Consumer<TaskProvider>(
             builder: (context, tp, _) {
               return SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => tp.toggleTask(task),
-                  icon: Icon(task.isCompleted ? Icons.undo : Icons.check_circle_outline),
-                  label: Text(task.isCompleted ? '标记为未完成' : '标记为已完成'),
+                  onPressed: () {
+                    tp.toggleTask(widget.task);
+                  },
+                  icon: Icon(widget.task.isCompleted
+                      ? Icons.undo
+                      : Icons.check_circle_outline),
+                  label: Text(widget.task.isCompleted
+                      ? '标记为未完成'
+                      : '标记为已完成'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: task.isCompleted ? AppTheme.bgMuted : AppTheme.primary,
-                    foregroundColor: task.isCompleted ? AppTheme.textSecondary : Colors.white,
+                    backgroundColor: widget.task.isCompleted
+                        ? AppTheme.bgMuted
+                        : AppTheme.primary,
+                    foregroundColor: widget.task.isCompleted
+                        ? AppTheme.textSecondary
+                        : Colors.white,
                   ),
                 ),
               );

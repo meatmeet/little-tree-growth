@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import '../utils/theme.dart';
 import '../utils/navigation.dart';
 import '../models/growth_record.dart';
@@ -17,6 +19,8 @@ class _MilestoneFormScreenState extends State<MilestoneFormScreen> {
   String _selectedType = 'first_word';
   DateTime _occurredAt = DateTime.now();
   final _notesController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  XFile? _photo;
   bool _saving = false;
 
   static const _types = [
@@ -67,6 +71,7 @@ class _MilestoneFormScreenState extends State<MilestoneFormScreen> {
       notes: _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null,
+      photoUrl: _photo?.path,
     );
 
     final ok = await context.read<GrowthProvider>().addMilestone(milestone);
@@ -154,6 +159,71 @@ class _MilestoneFormScreenState extends State<MilestoneFormScreen> {
                   const Icon(Icons.chevron_right, size: 18, color: AppTheme.textTertiary),
                 ],
               ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Photo
+          const Text('添加照片', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () async {
+              final source = await showDialog<ImageSource>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('选择照片'),
+                  content: const Text('从哪里选择照片？'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(ImageSource.camera),
+                      child: const Text('拍照'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(ImageSource.gallery),
+                      child: const Text('相册'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: const Text('取消'),
+                    ),
+                  ],
+                ),
+              );
+              if (source != null) {
+                final photo = await _picker.pickImage(source: source, maxWidth: 1024);
+                if (photo != null) {
+                  setState(() => _photo = photo);
+                }
+              }
+            },
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppTheme.bgMuted,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE0E0E0)),
+              ),
+              child: _photo != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(_photo!.path),
+                        width: double.infinity,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt_outlined, size: 24, color: AppTheme.textTertiary),
+                          SizedBox(width: 8),
+                          Text('点击拍照或选择照片', style: TextStyle(color: AppTheme.textTertiary, fontSize: 14)),
+                        ],
+                      ),
+                    ),
             ),
           ),
 

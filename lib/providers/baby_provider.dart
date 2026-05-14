@@ -11,11 +11,13 @@ class BabyProvider extends ChangeNotifier {
   List<BabyModel> _babies = [];
   BabyModel? _currentBaby;
   bool _loading = false;
+  bool _hasLoaded = false;
   String? _error;
 
   List<BabyModel> get babies => _babies;
   BabyModel? get currentBaby => _currentBaby;
   bool get loading => _loading;
+  bool get hasLoaded => _hasLoaded;
   String? get error => _error;
 
   Future<void> loadBabies() async {
@@ -33,12 +35,14 @@ class BabyProvider extends ChangeNotifier {
       _currentBaby ??= _babies.isNotEmpty ? _babies.first : null;
     } catch (e) {
       _error = e.toString();
+      debugPrint('[BabyProvider] loadBabies error: $_error');
       // Try loading from cache
       final cached = _storage.getJson(AppConstants.babyKey);
       if (cached != null) {
         _currentBaby = BabyModel.fromJson(cached);
       }
     } finally {
+      _hasLoaded = true;
       _loading = false;
       notifyListeners();
     }

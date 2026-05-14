@@ -59,12 +59,19 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<bool> toggleTask(TaskModel task) async {
-    task.isCompleted = !task.isCompleted;
-    task.completedAt = task.isCompleted ? DateTime.now() : null;
+    final newCompleted = !task.isCompleted;
+    final updated = task.copyWith(
+      isCompleted: newCompleted,
+      completedAt: newCompleted ? DateTime.now() : null,
+    );
+    final idx = _todayTasks.indexOf(task);
+    if (idx >= 0) {
+      _todayTasks[idx] = updated;
+    }
     notifyListeners();
 
     try {
-      if (task.isCompleted) {
+      if (updated.isCompleted) {
         await _api.put('/tasks/daily/${task.id}/complete');
       } else {
         await _api.put('/tasks/daily/${task.id}/skip');
@@ -73,8 +80,9 @@ class TaskProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       // Revert on failure
-      task.isCompleted = !task.isCompleted;
-      task.completedAt = task.isCompleted ? DateTime.now() : null;
+      if (idx >= 0) {
+        _todayTasks[idx] = task;
+      }
       _error = e.toString();
       notifyListeners();
       return false;
@@ -95,6 +103,39 @@ class TaskProvider extends ChangeNotifier {
       await _api.post('/checkin', body: body.isNotEmpty ? body : null);
       _streakDays++;
       notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  List<Map<String, dynamic>> _calendarData = [];
+
+  List<Map<String, dynamic>> get calendarData => _calendarData;
+
+  Future<void> loadCalendar(int babyId, {String? month}) async {
+    try {
+      final m = month ??
+          '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}';
+      final res = await _api.get('/checkin/calendar',
+          queryParams: {'baby_id': '$babyId', 'month': m});
+      _calendarData = (res['data'] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList() ??
+          [];
+      notifyListeners();
+    } catch (e) {
+      debugPrint('loadCalendar error: $e');
+      _calendarData = [];
+      notifyListeners();
+    }
+  }
+
+  Future<bool> rateTask(int taskId, int rating) async {
+    try {
+      await _api.put('/tasks/$taskId/rating', body: {'rating': rating});
       return true;
     } catch (e) {
       _error = e.toString();

@@ -139,6 +139,20 @@ class GrowthProvider extends ChangeNotifier {
     );
   }
 
+  Map<String, dynamic>? _growthStandards;
+  Map<String, dynamic>? get growthStandards => _growthStandards;
+
+  Future<void> loadGrowthStandards(int babyId) async {
+    try {
+      final res = await _api.get('/growth/curve',
+          queryParams: {'baby_id': '$babyId'});
+      _growthStandards = res['data'] as Map<String, dynamic>?;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('loadGrowthStandards error: $e');
+    }
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();
